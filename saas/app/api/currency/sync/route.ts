@@ -31,11 +31,11 @@ export async function POST(req: NextRequest) {
       if (existing) {
         await prisma.exchangeRate.update({
           where: { id: existing.id },
-          data: { rate, date: rateDate },
+          data: { rate, effectiveDate: rateDate },
         });
       } else {
         await prisma.exchangeRate.create({
-          data: { organizationId: org.id, fromCurrency: code, toCurrency: "UZS", rate, date: rateDate },
+          data: { organizationId: org.id, fromCurrency: code, toCurrency: "UZS", rate, effectiveDate: rateDate },
         });
       }
       results.push({ org: org.id, code, rate });

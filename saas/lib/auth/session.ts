@@ -42,7 +42,7 @@ export async function createSession(userId: string): Promise<string> {
     organizationId: user.organizationId,
     branchId: user.branchId,
     sessionId: session.id,
-  } as SessionPayload)
+  } as SessionPayload & Record<string, unknown>)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_DURATION_HOURS}h`)

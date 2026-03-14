@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   const customers = await prisma.customer.findMany({
     where: {
       organizationId: session.organizationId,
-      ...(search ? { OR: [{ name: { contains: search, mode: "insensitive" } }, { phone: { contains: search } }] } : {}),
+      ...(search ? { OR: [{ fullName: { contains: search, mode: "insensitive" } }, { phone: { contains: search } }] } : {}),
     },
     include: { _count: { select: { sales: true } } },
     orderBy: { createdAt: "desc" },
@@ -23,11 +23,11 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const session = await getSessionFromRequest(req);
   if (!session?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { name, phone, email, address, notes } = await req.json();
+  const { name, phone, email } = await req.json();
   if (!name) return NextResponse.json({ error: "name required" }, { status: 400 });
 
   const customer = await prisma.customer.create({
-    data: { organizationId: session.organizationId, name, phone: phone || null, email: email || null, address: address || null, notes: notes || null },
+    data: { organizationId: session.organizationId, fullName: name, phone: phone || null, email: email || null },
   });
   return NextResponse.json(customer, { status: 201 });
 }

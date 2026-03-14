@@ -16,10 +16,10 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const session = await getSessionFromRequest(req);
   if (!session?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { name, description } = await req.json();
+  const { name } = await req.json();
   if (!name) return NextResponse.json({ error: "name required" }, { status: 400 });
   const cat = await prisma.incomeCategory.create({
-    data: { organizationId: session.organizationId, name, description: description || null },
+    data: { organizationId: session.organizationId, name },
   });
   return NextResponse.json(cat, { status: 201 });
 }

@@ -52,7 +52,10 @@
     "cookies-next": "^4.3.0",
     "next-themes": "^0.4.3",
     "react-hot-toast": "^2.4.1",
-    "numeral": "^2.0.6"
+    "numeral": "^2.0.6",
+    "tailwindcss": "^3.4.14",
+    "postcss": "^8",
+    "autoprefixer": "^10"
   },
   "devDependencies": {
     "typescript": "^5",
@@ -62,9 +65,6 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/numeral": "^2.0.5",
-    "tailwindcss": "^3.4.14",
-    "postcss": "^8",
-    "autoprefixer": "^10",
     "eslint": "^8",
     "eslint-config-next": "14.2.18",
     "tsx": "^4.19.1"
