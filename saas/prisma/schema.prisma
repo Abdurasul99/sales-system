@@ -1,0 +1,702 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── SUBSCRIPTION PLANS ──────────────────────────────────────────────────────
+
+model SubscriptionPlan {
+  id               String         @id @default(cuid())
+  name             String
+  slug             String         @unique
+  priceUzs         Decimal        @db.Decimal(15, 2)
+  billingCycleDays Int            @default(30)
+  maxProducts      Int?
+  maxEmployees     Int?
+  maxBranches      Int?
+  maxWorkstations  Int?
+  isActive         Boolean        @default(true)
+  sortOrder        Int            @default(0)
+  features         PlanFeature[]
+  subscriptions    Subscription[]
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+}
+
+model PlanFeature {
+  id      String          @id @default(cuid())
+  planId  String
+  feature FeatureKey
+  enabled Boolean         @default(true)
+  limit   Int?
+  plan    SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, feature])
+}
+
+enum FeatureKey {
+  ANALYTICS_BASIC
+  ANALYTICS_ADVANCED
+  ANALYTICS_AI
+  SALES_CASH
+  SALES_CARD
+  SALES_DEBT
+  BARCODE_SCANNER
+  QR_CODE_SCANNER
+  RECEIPT_PRINT
+  LABEL_PRINT
+  DISCOUNT_DIGITAL
+  DISCOUNT_PERCENTAGE
+  WAREHOUSE_BASIC
+  WAREHOUSE_ADVANCED
+  WRITE_OFF
+  SUPPLIER_MANAGEMENT
+  CLIENT_BASE
+  CRM
+  BONUS_SYSTEM
+  CASHBACK
+  SMS_MESSAGING
+  EMAIL_MESSAGING
+  AI_RECOMMENDATIONS
+  ABC_ANALYSIS
+  RETURN_SCHEME
+  FLEXIBLE_ROLES
+  MULTI_BRANCH
+  CASHIER_SHIFT
+  MARKETPLACE_SYNC
+  ACCOUNTING_1C
+  TSD_INTEGRATION
+}
+
+// ─── ORGANIZATION ────────────────────────────────────────────────────────────
+
+model Organization {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  logoUrl         String?
+  phone           String?
+  address         String?
+  timezone        String    @default("Asia/Tashkent")
+  defaultLocale   String    @default("ru")
+  primaryCurrency String    @default("UZS")
+  isActive        Boolean   @default(true)
+  isBlocked       Boolean   @default(false)
+  blockedReason   String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  subscription      Subscription?
+  branches          Branch[]
+  users             User[]
+  products          Product[]
+  categories        ProductCategory[]
+  sales             Sale[]
+  expenses          Expense[]
+  expenseCategories ExpenseCategory[]
+  incomes           Income[]
+  incomeCategories  IncomeCategory[]
+  suppliers         Supplier[]
+  customers         Customer[]
+  exchangeRates     ExchangeRate[]
+  auditLogs         AuditLog[]
+  discountRules     DiscountRule[]
+  notifications     Notification[]
+  purchases         Purchase[]
+}
+
+model Subscription {
+  id              String           @id @default(cuid())
+  organizationId  String           @unique
+  planId          String
+  startDate       DateTime         @default(now())
+  endDate         DateTime
+  isActive        Boolean          @default(true)
+  autoRenew       Boolean          @default(true)
+  priceAtPurchase Decimal          @db.Decimal(15, 2)
+  currency        String           @default("UZS")
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  organization Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan         SubscriptionPlan @relation(fields: [planId], references: [id])
+}
+
+model Branch {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  address        String?
+  phone          String?
+  isActive       Boolean  @default(true)
+  isMainBranch   Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization  Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  users         User[]
+  inventory     Inventory[]
+  sales         Sale[]
+  cashierShifts CashierShift[]
+  expenses      Expense[]
+  incomes       Income[]
+  purchases     Purchase[]
+
+  @@unique([organizationId, name])
+}
+
+// ─── USERS & AUTH ────────────────────────────────────────────────────────────
+
+model User {
+  id             String    @id @default(cuid())
+  organizationId String?
+  branchId       String?
+  fullName       String
+  phone          String    @unique
+  login          String    @unique
+  passwordHash   String
+  role           UserRole
+  avatarUrl      String?
+  isActive       Boolean   @default(true)
+  isBlocked      Boolean   @default(false)
+  blockedReason  String?
+  lastActiveAt   DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  organization  Organization?    @relation(fields: [organizationId], references: [id])
+  branch        Branch?          @relation(fields: [branchId], references: [id])
+  permissions   UserPermission[]
+  sessions      Session[]
+  sales         Sale[]
+  cashierShifts CashierShift[]
+  auditLogs     AuditLog[]
+}
+
+enum UserRole {
+  SUPERADMIN
+  ADMIN
+  CASHIER
+  WAREHOUSE_CLERK
+  SUPPLIER_CONTACT
+}
+
+model UserPermission {
+  id         String        @id @default(cuid())
+  userId     String
+  permission PermissionKey
+  granted    Boolean       @default(true)
+  user       User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, permission])
+}
+
+enum PermissionKey {
+  SALES_CREATE
+  SALES_CANCEL
+  SALES_APPLY_DISCOUNT
+  SALES_DEBT_CREATE
+  SALES_VIEW_HISTORY
+  INVENTORY_VIEW
+  INVENTORY_RECEIVE
+  INVENTORY_WRITEOFF
+  INVENTORY_ADJUST
+  PRODUCTS_CREATE
+  PRODUCTS_EDIT
+  PRODUCTS_DELETE
+  CATEGORIES_MANAGE
+  EXPENSES_VIEW
+  EXPENSES_CREATE
+  EXPENSES_APPROVE
+  INCOME_VIEW
+  INCOME_CREATE
+  SUPPLIERS_VIEW
+  SUPPLIERS_MANAGE
+  CUSTOMERS_VIEW
+  CUSTOMERS_MANAGE
+  ANALYTICS_VIEW
+  ANALYTICS_EXPORT
+  USERS_VIEW
+  USERS_MANAGE
+  BRANCHES_MANAGE
+  SETTINGS_MANAGE
+  REPORTS_VIEW
+  REPORTS_EXPORT
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  ipAddress String?
+  userAgent String?
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── PRODUCTS & INVENTORY ────────────────────────────────────────────────────
+
+model ProductCategory {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  slug           String
+  description    String?
+  imageUrl       String?
+  color          String?
+  isActive       Boolean  @default(true)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  products     Product[]
+
+  @@unique([organizationId, slug])
+}
+
+model Product {
+  id             String   @id @default(cuid())
+  organizationId String
+  categoryId     String?
+  name           String
+  sku            String?
+  barcode        String?
+  description    String?
+  imageUrl       String?
+  unit           String   @default("шт")
+  costPrice      Decimal  @db.Decimal(15, 2) @default(0)
+  sellingPrice   Decimal  @db.Decimal(15, 2)
+  minStockLevel  Int      @default(0)
+  isActive       Boolean  @default(true)
+  isArchived     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization  Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  category      ProductCategory? @relation(fields: [categoryId], references: [id])
+  inventory     Inventory[]
+  saleItems     SaleItem[]
+  purchaseItems PurchaseItem[]
+  returnItems   ReturnItem[]
+
+  @@unique([organizationId, barcode])
+}
+
+model Inventory {
+  id          String  @id @default(cuid())
+  productId   String
+  branchId    String
+  quantity    Decimal @db.Decimal(15, 3) @default(0)
+  reservedQty Decimal @db.Decimal(15, 3) @default(0)
+  updatedAt   DateTime @updatedAt
+
+  product   Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  branch    Branch              @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  movements InventoryMovement[]
+
+  @@unique([productId, branchId])
+}
+
+model InventoryMovement {
+  id             String       @id @default(cuid())
+  inventoryId    String
+  type           MovementType
+  quantity       Decimal      @db.Decimal(15, 3)
+  quantityBefore Decimal      @db.Decimal(15, 3)
+  quantityAfter  Decimal      @db.Decimal(15, 3)
+  referenceId    String?
+  referenceType  String?
+  notes          String?
+  createdAt      DateTime     @default(now())
+  createdBy      String?
+
+  inventory Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+}
+
+enum MovementType {
+  IN_PURCHASE
+  IN_RETURN
+  IN_ADJUSTMENT
+  OUT_SALE
+  OUT_WRITEOFF
+  OUT_RETURN_TO_SUPPLIER
+  OUT_ADJUSTMENT
+}
+
+// ─── SALES ───────────────────────────────────────────────────────────────────
+
+model Sale {
+  id             String      @id @default(cuid())
+  organizationId String
+  branchId       String
+  cashierId      String
+  customerId     String?
+  receiptNumber  String
+  status         SaleStatus  @default(COMPLETED)
+  paymentType    PaymentType
+  subtotal       Decimal     @db.Decimal(15, 2)
+  discountAmount Decimal     @db.Decimal(15, 2) @default(0)
+  discountType   String?
+  discountValue  Decimal?    @db.Decimal(15, 2)
+  total          Decimal     @db.Decimal(15, 2)
+  paidAmount     Decimal     @db.Decimal(15, 2) @default(0)
+  debtAmount     Decimal     @db.Decimal(15, 2) @default(0)
+  debtPaidAt     DateTime?
+  cancelReason   String?
+  notes          String?
+  currency       String      @default("UZS")
+  exchangeRate   Decimal?    @db.Decimal(15, 4)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  organization Organization  @relation(fields: [organizationId], references: [id])
+  branch       Branch        @relation(fields: [branchId], references: [id])
+  cashier      User          @relation(fields: [cashierId], references: [id])
+  customer     Customer?     @relation(fields: [customerId], references: [id])
+  items        SaleItem[]
+  payments     Payment[]
+  returns      ReturnRecord[]
+
+  @@unique([organizationId, receiptNumber])
+}
+
+enum SaleStatus {
+  COMPLETED
+  CANCELLED
+  DEBT
+  PARTIALLY_PAID
+  REFUNDED
+}
+
+enum PaymentType {
+  CASH
+  CARD
+  DEBT
+  MIXED
+  TRANSFER
+}
+
+model SaleItem {
+  id        String   @id @default(cuid())
+  saleId    String
+  productId String
+  quantity  Decimal  @db.Decimal(15, 3)
+  unitPrice Decimal  @db.Decimal(15, 2)
+  costPrice Decimal  @db.Decimal(15, 2)
+  discount  Decimal  @db.Decimal(15, 2) @default(0)
+  total     Decimal  @db.Decimal(15, 2)
+  createdAt DateTime @default(now())
+
+  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Payment {
+  id          String      @id @default(cuid())
+  saleId      String
+  amount      Decimal     @db.Decimal(15, 2)
+  paymentType PaymentType
+  currency    String      @default("UZS")
+  exchangeRate Decimal?   @db.Decimal(15, 4)
+  paidAt      DateTime    @default(now())
+  notes       String?
+
+  sale Sale @relation(fields: [saleId], references: [id], onDelete: Cascade)
+}
+
+// ─── RETURNS ─────────────────────────────────────────────────────────────────
+
+model ReturnRecord {
+  id             String      @id @default(cuid())
+  saleId         String
+  reason         String?
+  refundAmount   Decimal     @db.Decimal(15, 2)
+  refundMethod   PaymentType
+  processedBy    String
+  createdAt      DateTime    @default(now())
+
+  sale  Sale         @relation(fields: [saleId], references: [id])
+  items ReturnItem[]
+}
+
+model ReturnItem {
+  id             String  @id @default(cuid())
+  returnRecordId String
+  productId      String
+  quantity       Decimal @db.Decimal(15, 3)
+  unitPrice      Decimal @db.Decimal(15, 2)
+  total          Decimal @db.Decimal(15, 2)
+
+  returnRecord ReturnRecord @relation(fields: [returnRecordId], references: [id], onDelete: Cascade)
+  product      Product      @relation(fields: [productId], references: [id])
+}
+
+// ─── CASHIER SHIFT ───────────────────────────────────────────────────────────
+
+model CashierShift {
+  id             String      @id @default(cuid())
+  branchId       String
+  cashierId      String
+  openedAt       DateTime    @default(now())
+  closedAt       DateTime?
+  openingBalance Decimal     @db.Decimal(15, 2) @default(0)
+  closingBalance Decimal?    @db.Decimal(15, 2)
+  totalSales     Decimal     @db.Decimal(15, 2) @default(0)
+  totalCash      Decimal     @db.Decimal(15, 2) @default(0)
+  totalCard      Decimal     @db.Decimal(15, 2) @default(0)
+  totalDebt      Decimal     @db.Decimal(15, 2) @default(0)
+  status         ShiftStatus @default(OPEN)
+  notes          String?
+
+  branch  Branch @relation(fields: [branchId], references: [id])
+  cashier User   @relation(fields: [cashierId], references: [id])
+}
+
+enum ShiftStatus {
+  OPEN
+  CLOSED
+}
+
+// ─── SUPPLIERS & PURCHASING ──────────────────────────────────────────────────
+
+model Supplier {
+  id             String   @id @default(cuid())
+  organizationId String
+  companyName    String
+  contactName    String?
+  phone          String?
+  email          String?
+  address        String?
+  inn            String?
+  notes          String?
+  isActive       Boolean  @default(true)
+  currentBalance Decimal  @db.Decimal(15, 2) @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  purchases    Purchase[]
+}
+
+model Purchase {
+  id             String         @id @default(cuid())
+  organizationId String
+  supplierId     String
+  branchId       String
+  invoiceNumber  String?
+  status         PurchaseStatus @default(PENDING)
+  total          Decimal        @db.Decimal(15, 2)
+  paidAmount     Decimal        @db.Decimal(15, 2) @default(0)
+  debtAmount     Decimal        @db.Decimal(15, 2) @default(0)
+  currency       String         @default("UZS")
+  receivedAt     DateTime?
+  notes          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  organization Organization   @relation(fields: [organizationId], references: [id])
+  supplier     Supplier       @relation(fields: [supplierId], references: [id])
+  branch       Branch         @relation(fields: [branchId], references: [id])
+  items        PurchaseItem[]
+}
+
+enum PurchaseStatus {
+  PENDING
+  RECEIVED
+  PARTIAL
+  CANCELLED
+}
+
+model PurchaseItem {
+  id         String  @id @default(cuid())
+  purchaseId String
+  productId  String
+  quantity   Decimal @db.Decimal(15, 3)
+  costPrice  Decimal @db.Decimal(15, 2)
+  total      Decimal @db.Decimal(15, 2)
+
+  purchase Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id])
+}
+
+// ─── FINANCE ─────────────────────────────────────────────────────────────────
+
+model ExpenseCategory {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  color          String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  expenses     Expense[]
+
+  @@unique([organizationId, name])
+}
+
+model Expense {
+  id             String        @id @default(cuid())
+  organizationId String
+  branchId       String?
+  categoryId     String?
+  amount         Decimal       @db.Decimal(15, 2)
+  currency       String        @default("UZS")
+  description    String
+  status         ExpenseStatus @default(CONFIRMED)
+  paidAt         DateTime      @default(now())
+  createdBy      String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branch       Branch?         @relation(fields: [branchId], references: [id])
+  category     ExpenseCategory? @relation(fields: [categoryId], references: [id])
+}
+
+enum ExpenseStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model IncomeCategory {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  color          String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  incomes      Income[]
+
+  @@unique([organizationId, name])
+}
+
+model Income {
+  id             String   @id @default(cuid())
+  organizationId String
+  branchId       String?
+  categoryId     String?
+  amount         Decimal  @db.Decimal(15, 2)
+  currency       String   @default("UZS")
+  description    String
+  receivedAt     DateTime @default(now())
+  createdBy      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  branch       Branch?         @relation(fields: [branchId], references: [id])
+  category     IncomeCategory? @relation(fields: [categoryId], references: [id])
+}
+
+// ─── CURRENCY ────────────────────────────────────────────────────────────────
+
+model Currency {
+  id       String  @id @default(cuid())
+  code     String  @unique
+  name     String
+  symbol   String
+  isBase   Boolean @default(false)
+  isActive Boolean @default(true)
+}
+
+model ExchangeRate {
+  id             String   @id @default(cuid())
+  organizationId String
+  fromCurrency   String
+  toCurrency     String
+  rate           Decimal  @db.Decimal(18, 6)
+  source         String   @default("MANUAL")
+  effectiveDate  DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+// ─── CRM / CUSTOMERS ─────────────────────────────────────────────────────────
+
+model Customer {
+  id              String   @id @default(cuid())
+  organizationId  String
+  fullName        String
+  phone           String?
+  email           String?
+  segment         String?
+  bonusBalance    Decimal  @db.Decimal(15, 2) @default(0)
+  cashbackBalance Decimal  @db.Decimal(15, 2) @default(0)
+  totalPurchased  Decimal  @db.Decimal(15, 2) @default(0)
+  debtAmount      Decimal  @db.Decimal(15, 2) @default(0)
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  sales        Sale[]
+}
+
+// ─── DISCOUNTS ───────────────────────────────────────────────────────────────
+
+model DiscountRule {
+  id             String       @id @default(cuid())
+  organizationId String
+  name           String
+  type           DiscountType
+  value          Decimal      @db.Decimal(10, 4)
+  minOrderAmount Decimal?     @db.Decimal(15, 2)
+  maxUses        Int?
+  usedCount      Int          @default(0)
+  validFrom      DateTime?
+  validTo        DateTime?
+  isActive       Boolean      @default(true)
+  createdAt      DateTime     @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+// ─── NOTIFICATIONS & AUDIT ───────────────────────────────────────────────────
+
+model Notification {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String?
+  type           String
+  title          String
+  message        String
+  isRead         Boolean  @default(false)
+  data           Json?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String?
+  action         String
+  entity         String
+  entityId       String?
+  before         Json?
+  after          Json?
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id])
+}

@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+saas/.next/
+saas/out/
+saas/.vercel
+
+# Env files - NEVER commit these
+saas/.env
+saas/.env.local
+saas/.env.production
+.env
+.env.local
+.env.production
+
+# MCP config (has API keys)
+.mcp.json
+
+# Build
+saas/dist/
+saas/build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Prisma
+saas/prisma/migrations/
+N8N/n8n-mcp/
