@@ -71,6 +71,11 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "shiftId обязателен" }, { status: 400 });
   }
 
+  const parsedClosingBalance = Number(closingBalance ?? 0);
+  if (isNaN(parsedClosingBalance) || parsedClosingBalance < 0) {
+    return NextResponse.json({ error: "closingBalance должен быть числом >= 0" }, { status: 400 });
+  }
+
   const shift = await prisma.cashierShift.findFirst({
     where: { id: shiftId, cashierId: userId, status: "OPEN" },
     include: { branch: { select: { organizationId: true } } },
@@ -99,7 +104,7 @@ export async function PATCH(req: NextRequest) {
     data: {
       status: "CLOSED",
       closedAt: new Date(),
-      closingBalance: Number(closingBalance ?? 0),
+      closingBalance: parsedClosingBalance,
       totalSales,
       notes: notes || null,
     },

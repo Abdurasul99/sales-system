@@ -342,7 +342,13 @@ export function SalesPOS({ products, categories, cashierId, branchId, organizati
               min={0}
               max={discountType === "PERCENTAGE" ? 100 : subtotal}
               value={globalDiscount}
-              onChange={(e) => setGlobalDiscount(Number(e.target.value))}
+              onChange={(e) => {
+                const val = Number(e.target.value);
+                const capped = discountType === "PERCENTAGE"
+                  ? Math.min(100, Math.max(0, val))
+                  : Math.max(0, val);
+                setGlobalDiscount(capped);
+              }}
               placeholder="Скидка"
               className="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-purple-500"
             />

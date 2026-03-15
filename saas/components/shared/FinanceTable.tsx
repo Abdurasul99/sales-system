@@ -46,6 +46,8 @@ export function FinanceTable({ records: initialRecords, categories, monthTotal: 
 
   async function handleSave() {
     if (!form.description || !form.amount) { toast.error("Заполните обязательные поля"); return; }
+    const parsedAmount = parseFloat(form.amount);
+    if (isNaN(parsedAmount) || parsedAmount <= 0) { toast.error("Введите корректную сумму"); return; }
     setSaving(true);
     try {
       const endpoint = isExpense ? "/api/expenses" : "/api/income";

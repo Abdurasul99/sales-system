@@ -6,6 +6,13 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   const session = await getSessionFromRequest(req);
   if (!session?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const body = await req.json();
-  await prisma.supplier.updateMany({ where: { id: params.id, organizationId: session.organizationId }, data: body });
+
+  // Whitelist only updatable fields — prevent mass assignment attacks
+  const { companyName, contactName, phone, email, inn, address, notes } = body;
+
+  await prisma.supplier.updateMany({
+    where: { id: params.id, organizationId: session.organizationId },
+    data: { companyName, contactName, phone, email, inn, address, notes },
+  });
   return NextResponse.json({ success: true });
 }

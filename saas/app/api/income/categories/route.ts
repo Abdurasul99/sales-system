@@ -28,6 +28,10 @@ export async function DELETE(req: NextRequest) {
   const session = await getSessionFromRequest(req);
   if (!session?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await req.json();
-  await prisma.incomeCategory.delete({ where: { id, organizationId: session.organizationId } });
-  return NextResponse.json({ success: true });
+  try {
+    await prisma.incomeCategory.delete({ where: { id, organizationId: session.organizationId } });
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json({ error: "Нельзя удалить категорию с доходами" }, { status: 409 });
+  }
 }
