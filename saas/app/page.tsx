@@ -134,15 +134,13 @@ export default function LandingPage() {
                   </div>
                 ))}
               </div>
-              <a
-                href="https://t.me/salessystemuz_bot"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/register"
                 className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg shadow-sky-200"
               >
                 <Send className="w-4 h-4" />
-                Подключить бота
-              </a>
+                Попробовать бесплатно
+              </Link>
             </div>
             <div className="flex-shrink-0">
               <div className="w-72 bg-white rounded-3xl shadow-2xl shadow-sky-100 p-5 border border-sky-100">

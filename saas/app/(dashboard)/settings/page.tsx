@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Save, Building2, Bell, Shield, Palette } from "lucide-react";
+import { Save, Building2, Bell, Shield, Send, Copy, Check, Loader2, CheckCircle, XCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface OrgSettings {
@@ -11,21 +11,38 @@ interface OrgSettings {
   primaryCurrency: string;
 }
 
+interface TelegramStatus {
+  connected: boolean;
+  token: string | null;
+}
+
 export default function SettingsPage() {
   const [settings, setSettings] = useState<OrgSettings>({ name: "", phone: "", address: "", timezone: "Asia/Tashkent", primaryCurrency: "UZS" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState<"general" | "notifications" | "security">("general");
+  const [tab, setTab] = useState<"general" | "notifications" | "security" | "telegram">("general");
+
+  // Telegram state
+  const [tg, setTg] = useState<TelegramStatus>({ connected: false, token: null });
+  const [tgLoading, setTgLoading] = useState(false);
+  const [tgGenerating, setTgGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetch("/api/settings")
       .then(r => r.json())
-      .then(data => {
-        if (data) setSettings(s => ({ ...s, ...data }));
-        setLoading(false);
-      })
+      .then(data => { if (data) setSettings(s => ({ ...s, ...data })); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (tab !== "telegram") return;
+    setTgLoading(true);
+    fetch("/api/telegram/connect")
+      .then(r => r.json())
+      .then(d => setTg(d))
+      .finally(() => setTgLoading(false));
+  }, [tab]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,9 +57,34 @@ export default function SettingsPage() {
     else toast.error("Ошибка сохранения");
   };
 
+  async function generateToken() {
+    setTgGenerating(true);
+    const res = await fetch("/api/telegram/connect", { method: "POST" });
+    const data = await res.json();
+    setTgGenerating(false);
+    if (res.ok) setTg({ connected: false, token: data.token });
+    else toast.error("Ошибка генерации кода");
+  }
+
+  async function disconnectTelegram() {
+    await fetch("/api/telegram/connect", { method: "DELETE" });
+    setTg({ connected: false, token: null });
+    toast.success("Telegram отключён");
+  }
+
+  function copyCommand() {
+    if (!tg.token) return;
+    navigator.clipboard.writeText(`/connect ${tg.token}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME ?? "salessystemuz_bot";
+
   const tabs = [
     { id: "general", label: "Общие", icon: Building2 },
     { id: "notifications", label: "Уведомления", icon: Bell },
+    { id: "telegram", label: "Telegram", icon: Send },
     { id: "security", label: "Безопасность", icon: Shield },
   ] as const;
 
@@ -151,6 +193,127 @@ export default function SettingsPage() {
             </div>
           )}
 
+          {tab === "telegram" && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="p-6 border-b border-gray-200 flex items-center gap-3">
+                <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center">
+                  <Send className="w-4 h-4 text-sky-600" />
+                </div>
+                <div>
+                  <h2 className="font-semibold text-gray-900">Telegram уведомления</h2>
+                  <p className="text-xs text-gray-500">Получайте отчёты и уведомления в Telegram</p>
+                </div>
+              </div>
+
+              <div className="p-6">
+                {tgLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                  </div>
+                ) : tg.connected ? (
+                  /* Connected state */
+                  <div className="space-y-5">
+                    <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-xl">
+                      <CheckCircle className="w-5 h-5 text-green-600 shrink-0" />
+                      <div>
+                        <p className="text-sm font-semibold text-green-800">Telegram подключён</p>
+                        <p className="text-xs text-green-600">Вы будете получать уведомления в вашем Telegram</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-3">Доступные команды в боте:</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { cmd: "/today", desc: "Итоги за сегодня" },
+                          { cmd: "/stock", desc: "Низкий остаток" },
+                          { cmd: "/top", desc: "Топ-5 товаров" },
+                          { cmd: "/help", desc: "Все команды" },
+                        ].map(c => (
+                          <div key={c.cmd} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                            <code className="text-xs font-bold text-purple-600">{c.cmd}</code>
+                            <span className="text-xs text-gray-500">{c.desc}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center pt-2">
+                      <a href={`https://t.me/${botUsername}`} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm text-sky-600 hover:text-sky-700 font-medium">
+                        <Send className="w-4 h-4" /> Открыть бота
+                      </a>
+                      <button onClick={disconnectTelegram}
+                        className="flex items-center gap-2 text-sm text-red-500 hover:text-red-700">
+                        <XCircle className="w-4 h-4" /> Отключить
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Not connected state */
+                  <div className="space-y-6">
+                    <p className="text-sm text-gray-600">
+                      Подключите Telegram чтобы получать уведомления о продажах, складе и ежедневные отчёты прямо в мессенджере.
+                    </p>
+
+                    {/* Steps */}
+                    <div className="space-y-4">
+                      <div className="flex gap-3">
+                        <div className="w-6 h-6 bg-sky-600 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Откройте бота в Telegram</p>
+                          <a href={`https://t.me/${botUsername}`} target="_blank" rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 mt-1.5 bg-sky-500 hover:bg-sky-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
+                            <Send className="w-3 h-3" /> @{botUsername}
+                          </a>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3">
+                        <div className="w-6 h-6 bg-sky-600 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">Получите код подключения</p>
+                          <p className="text-xs text-gray-500 mb-2">Нажмите кнопку ниже чтобы сгенерировать одноразовый код</p>
+                          {tg.token ? (
+                            <div className="flex items-center gap-2">
+                              <div className="flex-1 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 flex items-center justify-between">
+                                <code className="text-sm font-bold text-gray-900 tracking-widest">/connect {tg.token}</code>
+                              </div>
+                              <button onClick={copyCommand}
+                                className="p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                              </button>
+                            </div>
+                          ) : (
+                            <button onClick={generateToken} disabled={tgGenerating}
+                              className="flex items-center gap-2 px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg disabled:opacity-50">
+                              {tgGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                              Сгенерировать код
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3">
+                        <div className="w-6 h-6 bg-sky-600 text-white rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">Отправьте код боту</p>
+                          <p className="text-xs text-gray-500">Скопируйте команду выше и отправьте её боту. Готово!</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {tg.token && (
+                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-700">
+                        ⚠️ Код одноразовый и действует 24 часа. После отправки боту подключение активируется автоматически.
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {tab === "security" && (
             <div className="bg-white rounded-xl shadow-sm border border-gray-200">
               <div className="p-6 border-b border-gray-200">
@@ -164,18 +327,11 @@ export default function SettingsPage() {
                 <div>
                   <h3 className="text-sm font-semibold text-gray-700 mb-3">Политика паролей</h3>
                   <div className="space-y-2 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                      Минимум 8 символов
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                      Хранятся в виде bcrypt хэша (12 раундов)
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-                      Токены сессий подписаны JWT с HS256
-                    </div>
+                    {["Минимум 8 символов", "Хранятся в виде bcrypt хэша (12 раундов)", "Токены сессий подписаны JWT с HS256"].map(t => (
+                      <div key={t} className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full" /> {t}
+                      </div>
+                    ))}
                   </div>
                 </div>
                 <div>
