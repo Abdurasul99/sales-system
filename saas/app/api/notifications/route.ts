@@ -31,25 +31,23 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const session = await getSessionFromRequest(req);
 
-  // Also allow internal calls with x-internal-token header (legacy)
+  // Also allow internal calls with x-internal-token header (server-to-server only)
   const internalToken = req.headers.get("x-internal-token");
+  const validInternalToken = process.env.INTERNAL_API_TOKEN;
   let organizationId: string | null = null;
-  let callerUserId: string | null = null;
 
   if (session) {
     organizationId = session.organizationId;
-    callerUserId = session.userId;
-  } else if (internalToken) {
-    // Legacy internal usage: get organizationId from body
+  } else if (internalToken && validInternalToken && internalToken === validInternalToken) {
+    // Validated internal server-to-server call
     const body = await req.json();
     organizationId = body.organizationId ?? null;
-    callerUserId = body.userId ?? null;
 
     if (!organizationId) {
       return NextResponse.json({ error: "organizationId required" }, { status: 400 });
     }
 
-    const { type, title, message, link, userId, data } = body;
+    const { type, title, message, userId, data } = body;
     const notification = await prisma.notification.create({
       data: {
         organizationId,
@@ -70,7 +68,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { type, title, message, link, userId } = body;
+  const { type, title, message, userId } = body;
 
   if (!type || !title || !message) {
     return NextResponse.json({ error: "type, title, message обязательны" }, { status: 400 });

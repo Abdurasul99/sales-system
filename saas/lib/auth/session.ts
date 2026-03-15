@@ -3,9 +3,11 @@ import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db/prisma";
 
-const SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "fallback-secret-change-in-production"
-);
+const jwtSecret = process.env.JWT_SECRET;
+if (!jwtSecret && process.env.NODE_ENV === "production") {
+  throw new Error("JWT_SECRET environment variable is required in production");
+}
+const SECRET = new TextEncoder().encode(jwtSecret || "dev-only-fallback-secret");
 
 const COOKIE_NAME = "sales_session";
 const SESSION_DURATION_HOURS = 24;

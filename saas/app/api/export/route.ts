@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       where: { organizationId: orgId },
       include: { items: { include: { product: { select: { name: true } } } } },
       orderBy: { createdAt: "desc" },
-      take: 5000,
+      take: 1000,
     });
     filename = "sales.csv";
     csv = toCSV(
@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
       where: { organizationId: orgId },
       include: { category: { select: { name: true } } },
       orderBy: { createdAt: "desc" },
-      take: 5000,
+      take: 1000,
     });
     filename = "expenses.csv";
     csv = toCSV(

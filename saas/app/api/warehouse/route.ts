@@ -45,9 +45,11 @@ export async function POST(req: NextRequest) {
   });
   if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
 
-  // Get the branch to use
+  // Get the branch to use — always validate it belongs to this org
   const targetBranchId = branchId ?? session.branchId;
   if (!targetBranchId) return NextResponse.json({ error: "branchId required" }, { status: 400 });
+  const branch = await prisma.branch.findFirst({ where: { id: targetBranchId, organizationId: session.organizationId } });
+  if (!branch) return NextResponse.json({ error: "Branch not found" }, { status: 403 });
 
   const result = await prisma.$transaction(async (tx) => {
     let inv = await tx.inventory.findUnique({

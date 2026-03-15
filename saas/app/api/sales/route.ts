@@ -35,9 +35,19 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { organizationId, branchId, cashierId, paymentType, items, subtotal, discountAmount, discountType, discountValue, total, notes, currency } = body;
+    const { branchId: bodyBranchId, paymentType, items, subtotal, discountAmount, discountType, discountValue, total, notes, currency } = body;
 
     if (!items?.length) return NextResponse.json({ error: "Нет товаров" }, { status: 400 });
+
+    // Always use session values — never trust client-supplied org/cashier IDs
+    const organizationId = session.organizationId;
+    const cashierId = session.userId;
+
+    // Validate branchId belongs to this organization
+    const branchId = bodyBranchId ?? session.branchId;
+    if (!branchId) return NextResponse.json({ error: "branchId required" }, { status: 400 });
+    const branch = await prisma.branch.findFirst({ where: { id: branchId, organizationId } });
+    if (!branch) return NextResponse.json({ error: "Branch not found" }, { status: 403 });
 
     // Determine sale status
     let status = "COMPLETED";
