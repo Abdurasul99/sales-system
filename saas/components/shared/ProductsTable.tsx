@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Plus, Search, Edit, Trash2, Package, AlertTriangle, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
-import { cn, formatUzs, formatDate } from "@/lib/utils";
+import { cn, formatUzs } from "@/lib/utils";
 import toast from "react-hot-toast";
 
 interface Product {
@@ -56,15 +56,16 @@ export function ProductsTable({
     costPrice: "", sellingPrice: "", minStockLevel: "0", description: "",
   });
 
-  // Debounce search input
-  const debounceTimer = useCallback((val: string) => {
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  function handleSearch(val: string) {
     setSearch(val);
-    clearTimeout((debounceTimer as unknown as { _t?: ReturnType<typeof setTimeout> })._t);
-    (debounceTimer as unknown as { _t?: ReturnType<typeof setTimeout> })._t = setTimeout(() => {
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
       setDebouncedSearch(val);
       setPage(1);
     }, 300);
-  }, []);
+  }
 
   const filtered = useMemo(() => products.filter((p) => {
     const q = debouncedSearch.toLowerCase();
@@ -96,8 +97,12 @@ export function ProductsTable({
       const data = await res.json();
       if (!res.ok) { toast.error(data.error || "Ошибка"); return; }
       toast.success(editProduct ? "Товар обновлён" : "Товар создан");
+      if (editProduct) {
+        setProducts((prev) => prev.map((p) => p.id === editProduct.id ? { ...p, ...data } : p));
+      } else {
+        setProducts((prev) => [...prev, { ...data, quantity: 0 }]);
+      }
       setShowModal(false);
-      window.location.reload();
     } catch { toast.error("Ошибка сервера"); }
     finally { setSaving(false); }
   }
@@ -120,7 +125,7 @@ export function ProductsTable({
               className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="Поиск по названию, штрихкоду..."
               value={search}
-              onChange={(e) => debounceTimer(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
             />
           </div>
           <select

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Truck, Phone, Mail, Building2, Edit, XCircle, Loader2, CheckCircle } from "lucide-react";
+import { useState, useRef } from "react";
+import { Plus, Truck, Phone, Mail, Building2, Edit, XCircle, Loader2, CheckCircle, Search } from "lucide-react";
 import { cn, formatUzs } from "@/lib/utils";
 import toast from "react-hot-toast";
 
@@ -13,6 +13,19 @@ export function SuppliersTable({ suppliers: initial, organizationId }: { supplie
   const [editSupplier, setEditSupplier] = useState<Supplier | null>(null);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ companyName: "", contactName: "", phone: "", email: "", inn: "", address: "", notes: "" });
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  function handleSearch(val: string) {
+    setSearch(val);
+    clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setDebouncedSearch(val), 300);
+  }
+
+  const filtered = debouncedSearch
+    ? suppliers.filter((s) => s.companyName.toLowerCase().includes(debouncedSearch.toLowerCase()) || s.contactName?.toLowerCase().includes(debouncedSearch.toLowerCase()) || s.phone?.includes(debouncedSearch))
+    : suppliers;
 
   async function handleSave() {
     if (!form.companyName.trim()) { toast.error("Введите название компании"); return; }
@@ -26,8 +39,12 @@ export function SuppliersTable({ suppliers: initial, organizationId }: { supplie
       const data = await res.json();
       if (!res.ok) { toast.error(data.error || "Ошибка"); return; }
       toast.success(editSupplier ? "Поставщик обновлён" : "Поставщик добавлен");
+      if (editSupplier) {
+        setSuppliers((prev) => prev.map((s) => s.id === editSupplier.id ? { ...s, ...data } : s));
+      } else {
+        setSuppliers((prev) => [...prev, data]);
+      }
       setShowModal(false);
-      window.location.reload();
     } catch { toast.error("Ошибка"); } finally { setSaving(false); }
   }
 
@@ -43,7 +60,12 @@ export function SuppliersTable({ suppliers: initial, organizationId }: { supplie
         </button>
       </div>
 
-      {suppliers.length === 0 ? (
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <input className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="Поиск поставщика..." value={search} onChange={(e) => handleSearch(e.target.value)} />
+      </div>
+
+      {filtered.length === 0 ? (
         <div className="bg-white border border-gray-100 rounded-2xl py-20 flex flex-col items-center text-center shadow-sm">
           <Truck className="w-12 h-12 text-gray-200 mb-4" />
           <p className="text-gray-500 font-medium">Поставщики не добавлены</p>
@@ -51,7 +73,7 @@ export function SuppliersTable({ suppliers: initial, organizationId }: { supplie
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-          {suppliers.map((s) => (
+          {filtered.map((s) => (
             <div key={s.id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">

@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, BarChart3, Loader2 } from "lucide-react";
@@ -101,6 +102,12 @@ function LoginForm() {
           )}
         </button>
       </form>
+      <p className="text-center text-sm text-gray-400 mt-4">
+        Нет аккаунта?{" "}
+        <Link href="/register" className="text-purple-600 font-semibold hover:underline">
+          Зарегистрироваться бесплатно
+        </Link>
+      </p>
     </div>
   );
 }

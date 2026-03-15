@@ -30,7 +30,10 @@ const STATUS_LABELS: Record<string, string> = {
   CANCELLED: "Отменён",
 };
 
-export function FinanceTable({ records, categories, monthTotal, monthCount, type, organizationId }: FinanceTableProps) {
+export function FinanceTable({ records: initialRecords, categories, monthTotal: initialMonthTotal, monthCount: initialMonthCount, type, organizationId }: FinanceTableProps) {
+  const [records, setRecords] = useState(initialRecords);
+  const [monthTotal, setMonthTotal] = useState(initialMonthTotal);
+  const [monthCount, setMonthCount] = useState(initialMonthCount);
   const [showModal, setShowModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ description: "", amount: "", categoryId: categories[0]?.id ?? "", currency: "UZS" });
@@ -54,8 +57,12 @@ export function FinanceTable({ records, categories, monthTotal, monthCount, type
       const data = await res.json();
       if (!res.ok) { toast.error(data.error || "Ошибка"); return; }
       toast.success(isExpense ? "Расход добавлен" : "Доход добавлен");
+      const amount = parseFloat(form.amount);
+      setRecords((prev) => [...prev, data]);
+      setMonthTotal((prev) => prev + amount);
+      setMonthCount((prev) => prev + 1);
+      setForm({ description: "", amount: "", categoryId: categories[0]?.id ?? "", currency: "UZS" });
       setShowModal(false);
-      window.location.reload();
     } catch { toast.error("Ошибка"); } finally { setSaving(false); }
   }
 

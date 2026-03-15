@@ -120,6 +120,8 @@ model Subscription {
   priceAtPurchase Decimal          @db.Decimal(15, 2)
   currency        String           @default("UZS")
   notes           String?
+  isTrial         Boolean          @default(false)
+  trialEndsAt     DateTime?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -287,6 +289,7 @@ model Product {
   returnItems   ReturnItem[]
 
   @@unique([organizationId, barcode])
+  @@index([organizationId, isActive])
 }
 
 model Inventory {
@@ -302,6 +305,7 @@ model Inventory {
   movements InventoryMovement[]
 
   @@unique([productId, branchId])
+  @@index([branchId, quantity])
 }
 
 model InventoryMovement {
@@ -365,6 +369,8 @@ model Sale {
   returns      ReturnRecord[]
 
   @@unique([organizationId, receiptNumber])
+  @@index([organizationId, createdAt])
+  @@index([organizationId, status])
 }
 
 enum SaleStatus {
@@ -559,6 +565,8 @@ model Expense {
   organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   branch       Branch?         @relation(fields: [branchId], references: [id])
   category     ExpenseCategory? @relation(fields: [categoryId], references: [id])
+
+  @@index([organizationId, createdAt])
 }
 
 enum ExpenseStatus {
@@ -597,6 +605,8 @@ model Income {
   organization Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   branch       Branch?         @relation(fields: [branchId], references: [id])
   category     IncomeCategory? @relation(fields: [categoryId], references: [id])
+
+  @@index([organizationId, createdAt])
 }
 
 // ─── CURRENCY ────────────────────────────────────────────────────────────────
@@ -682,6 +692,8 @@ model Notification {
   createdAt      DateTime @default(now())
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, isRead])
 }
 
 model AuditLog {

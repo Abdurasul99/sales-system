@@ -2,6 +2,7 @@ import { getCurrentUser } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { AnalyticsDashboard } from "@/components/dashboard/AnalyticsDashboard";
+import { OnboardingCheck } from "@/components/onboarding/OnboardingCheck";
 import prisma from "@/lib/db/prisma";
 import { startOfDay, startOfWeek, startOfMonth, endOfDay } from "date-fns";
 
@@ -102,6 +103,9 @@ export default async function AnalyticsPage() {
     }),
   ]);
 
+  // Check product count for onboarding
+  const productCount = await prisma.product.count({ where: { organizationId: orgId } });
+
   // Resolve top product names
   const productIds = topProducts.map((p) => p.productId);
   const products = await prisma.product.findMany({
@@ -157,6 +161,7 @@ export default async function AnalyticsPage() {
       <div className="p-4 md:p-6">
         <AnalyticsDashboard data={analytics} />
       </div>
+      <OnboardingCheck hasProducts={productCount > 0} organizationId={user.organizationId!} />
     </div>
   );
 }

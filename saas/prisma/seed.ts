@@ -10,10 +10,10 @@ async function main() {
   const plans = await Promise.all([
     prisma.subscriptionPlan.upsert({
       where: { slug: "basic" },
-      update: {},
+      update: { priceUzs: 2000000, maxProducts: 500, maxEmployees: 5, maxBranches: 1, maxWorkstations: 2 },
       create: {
-        name: "Basic", slug: "basic", priceUzs: 150000, maxProducts: 150,
-        maxEmployees: 3, maxBranches: 1, maxWorkstations: 1, sortOrder: 1,
+        name: "Basic", slug: "basic", priceUzs: 2000000, maxProducts: 500,
+        maxEmployees: 5, maxBranches: 1, maxWorkstations: 2, sortOrder: 1,
         features: {
           create: [
             { feature: "ANALYTICS_BASIC", enabled: true },
@@ -25,16 +25,17 @@ async function main() {
             { feature: "DISCOUNT_DIGITAL", enabled: true },
             { feature: "WAREHOUSE_BASIC", enabled: true },
             { feature: "WRITE_OFF", enabled: true },
+            { feature: "CASHIER_SHIFT", enabled: true },
           ],
         },
       },
     }),
     prisma.subscriptionPlan.upsert({
       where: { slug: "plus" },
-      update: {},
+      update: { priceUzs: 5000000, maxProducts: 5000, maxEmployees: 15, maxBranches: 2, maxWorkstations: 5 },
       create: {
-        name: "Plus", slug: "plus", priceUzs: 350000, maxProducts: 1000,
-        maxEmployees: 10, maxBranches: 1, maxWorkstations: 3, sortOrder: 2,
+        name: "Plus", slug: "plus", priceUzs: 5000000, maxProducts: 5000,
+        maxEmployees: 15, maxBranches: 2, maxWorkstations: 5, sortOrder: 2,
         features: {
           create: [
             { feature: "ANALYTICS_BASIC", enabled: true },
@@ -54,16 +55,17 @@ async function main() {
             { feature: "CLIENT_BASE", enabled: true },
             { feature: "ABC_ANALYSIS", enabled: true },
             { feature: "RETURN_SCHEME", enabled: true },
+            { feature: "CASHIER_SHIFT", enabled: true },
           ],
         },
       },
     }),
     prisma.subscriptionPlan.upsert({
       where: { slug: "premium" },
-      update: {},
+      update: { priceUzs: 10000000, maxBranches: 5, maxWorkstations: 20 },
       create: {
-        name: "Premium", slug: "premium", priceUzs: 750000,
-        maxBranches: 3, maxWorkstations: 10, sortOrder: 3,
+        name: "Premium", slug: "premium", priceUzs: 10000000,
+        maxBranches: 5, maxWorkstations: 20, sortOrder: 3,
         features: {
           create: [
             { feature: "ANALYTICS_BASIC", enabled: true },
@@ -99,9 +101,9 @@ async function main() {
     }),
     prisma.subscriptionPlan.upsert({
       where: { slug: "platinum" },
-      update: {},
+      update: { priceUzs: 20000000 },
       create: {
-        name: "Platinum", slug: "platinum", priceUzs: 1500000, sortOrder: 4,
+        name: "Platinum", slug: "platinum", priceUzs: 20000000, sortOrder: 4,
         features: {
           create: [
             { feature: "ANALYTICS_BASIC", enabled: true },

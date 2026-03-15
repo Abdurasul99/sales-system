@@ -30,8 +30,12 @@ export function CategoriesManager({ categories: initial, organizationId }: { cat
       const data = await res.json();
       if (!res.ok) { toast.error(data.error || "Ошибка"); return; }
       toast.success(editCat ? "Категория обновлена" : "Категория создана");
+      if (editCat) {
+        setCategories((prev) => prev.map((c) => c.id === editCat.id ? { ...c, ...data } : c));
+      } else {
+        setCategories((prev) => [...prev, { ...data, productCount: 0 }]);
+      }
       setShowModal(false);
-      window.location.reload();
     } catch { toast.error("Ошибка"); } finally { setSaving(false); }
   }
 
