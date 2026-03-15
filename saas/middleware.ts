@@ -1,7 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromRequest } from "@/lib/auth/session";
 
-const PUBLIC_PATHS = ["/login", "/api/auth/login", "/api/auth/logout"];
+const PUBLIC_PATHS = [
+  "/login",
+  "/register",
+  "/api/auth/login",
+  "/api/auth/logout",
+  "/api/auth/register",
+  "/api/telegram/webhook",
+  "/api/cron/",
+  "/offline",
+];
 const SUPERADMIN_PATHS = ["/superadmin"];
 const ADMIN_PATHS = [
   "/analytics",
