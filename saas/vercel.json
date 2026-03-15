@@ -2,5 +2,11 @@
   "buildCommand": "npx prisma generate && npx prisma db push --accept-data-loss && next build",
   "installCommand": "npm install --legacy-peer-deps",
   "framework": "nextjs",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "crons": [
+    {
+      "path": "/api/cron/trial-check",
+      "schedule": "0 9 * * *"
+    }
+  ]
 }
