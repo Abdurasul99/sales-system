@@ -12,7 +12,7 @@ async function main() {
       where: { slug: "starter" },
       update: { priceUzs: 0, maxProducts: 100, maxEmployees: 2, maxBranches: 1, maxWorkstations: 1 },
       create: {
-        name: "Стартер", slug: "starter", priceUzs: 0, maxProducts: 100,
+        name: "Базовый", slug: "starter", priceUzs: 0, maxProducts: 100,
         maxEmployees: 2, maxBranches: 1, maxWorkstations: 1, sortOrder: 1,
         features: {
           create: [
@@ -62,9 +62,9 @@ async function main() {
     }),
     prisma.subscriptionPlan.upsert({
       where: { slug: "pro" },
-      update: { priceUzs: 7500000, maxProducts: null, maxEmployees: null, maxBranches: 5, maxWorkstations: 20 },
+      update: { priceUzs: 5000000, maxProducts: null, maxEmployees: null, maxBranches: 5, maxWorkstations: 20 },
       create: {
-        name: "Про", slug: "pro", priceUzs: 7500000,
+        name: "Про", slug: "pro", priceUzs: 5000000,
         maxProducts: null, maxEmployees: null, maxBranches: 5, maxWorkstations: 20, sortOrder: 3,
         features: {
           create: [
@@ -101,9 +101,9 @@ async function main() {
     }),
     prisma.subscriptionPlan.upsert({
       where: { slug: "korporat" },
-      update: { priceUzs: 15000000, maxProducts: null, maxEmployees: null, maxBranches: null, maxWorkstations: null },
+      update: { priceUzs: 10000000, maxProducts: null, maxEmployees: null, maxBranches: null, maxWorkstations: null },
       create: {
-        name: "Корпорат", slug: "korporat", priceUzs: 15000000,
+        name: "Корпорат", slug: "korporat", priceUzs: 10000000,
         maxProducts: null, maxEmployees: null, maxBranches: null, maxWorkstations: null, sortOrder: 4,
         features: {
           create: [

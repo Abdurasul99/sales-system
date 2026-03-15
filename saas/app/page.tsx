@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BarChart3, Package, ShoppingCart, Users, Zap, Shield, Globe, ArrowRight, CheckCircle, Sparkles, TrendingUp, Bell, Smartphone } from "lucide-react";
+import { BarChart3, Package, ShoppingCart, Users, Zap, Shield, Globe, ArrowRight, CheckCircle, Sparkles, TrendingUp, Bell, Smartphone, Send } from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -102,6 +102,91 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Telegram Bot */}
+      <section className="py-20 px-4 bg-gradient-to-br from-sky-50 to-indigo-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex flex-col lg:flex-row items-center gap-12">
+            <div className="flex-1">
+              <div className="inline-flex items-center gap-2 bg-sky-100 text-sky-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-5">
+                <Send className="w-3.5 h-3.5" />
+                Telegram Bot
+              </div>
+              <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
+                Управляйте бизнесом<br />прямо в Telegram
+              </h2>
+              <p className="text-gray-500 text-lg mb-8 leading-relaxed">
+                Получайте сводку продаж, остатки склада и уведомления об операциях —
+                без входа в систему. Всё в вашем любимом мессенджере.
+              </p>
+              <div className="space-y-4 mb-8">
+                {[
+                  { icon: "📊", title: "Ежедневная сводка", desc: "Выручка, прибыль и топ-товары дня — каждое утро в 9:00" },
+                  { icon: "📦", title: "Уведомления о складе", desc: "Мгновенные оповещения когда товар заканчивается" },
+                  { icon: "💰", title: "Итоги продаж", desc: "Получайте отчёт по каждой смене сразу после закрытия" },
+                  { icon: "🤖", title: "AI ассистент в чате", desc: "Задавайте вопросы о бизнесе прямо в Telegram" },
+                ].map((item) => (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <span className="text-2xl">{item.icon}</span>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">{item.title}</p>
+                      <p className="text-gray-500 text-sm">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <a
+                href="https://t.me/salessystemuz_bot"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg shadow-sky-200"
+              >
+                <Send className="w-4 h-4" />
+                Подключить бота
+              </a>
+            </div>
+            <div className="flex-shrink-0">
+              <div className="w-72 bg-white rounded-3xl shadow-2xl shadow-sky-100 p-5 border border-sky-100">
+                {/* Fake Telegram UI */}
+                <div className="flex items-center gap-3 pb-4 border-b border-gray-100 mb-4">
+                  <div className="w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center">
+                    <Send className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-900 text-sm">Sales System Bot</p>
+                    <p className="text-xs text-green-500">в сети</p>
+                  </div>
+                </div>
+                <div className="space-y-3 text-sm">
+                  <div className="bg-sky-50 rounded-2xl rounded-tl-sm p-3">
+                    <p className="font-semibold text-gray-800 mb-1">📊 Итоги за сегодня</p>
+                    <p className="text-gray-600">Выручка: <span className="font-bold text-gray-900">4,250,000 сум</span></p>
+                    <p className="text-gray-600">Прибыль: <span className="font-bold text-green-600">1,820,000 сум</span></p>
+                    <p className="text-gray-600">Продаж: <span className="font-bold text-gray-900">38 чеков</span></p>
+                    <p className="text-xs text-gray-400 mt-2">14:30</p>
+                  </div>
+                  <div className="bg-orange-50 rounded-2xl rounded-tl-sm p-3">
+                    <p className="font-semibold text-gray-800">⚠️ Низкий остаток</p>
+                    <p className="text-gray-600 text-xs mt-1">Coca-Cola 1.5л — осталось 3 шт.</p>
+                    <p className="text-xs text-gray-400 mt-1">14:45</p>
+                  </div>
+                  <div className="bg-gray-100 rounded-2xl rounded-tr-sm p-3 ml-8">
+                    <p className="text-gray-700">Покажи топ-5 товаров</p>
+                    <p className="text-xs text-gray-400 mt-1">14:46</p>
+                  </div>
+                  <div className="bg-sky-50 rounded-2xl rounded-tl-sm p-3">
+                    <p className="font-semibold text-gray-800 mb-1">🏆 Топ-5 товаров сегодня:</p>
+                    <p className="text-gray-600 text-xs">1. Coca-Cola 1.5л — 12 шт</p>
+                    <p className="text-gray-600 text-xs">2. Чипсы Lays — 9 шт</p>
+                    <p className="text-gray-600 text-xs">3. Молоко Тошсут — 8 шт</p>
+                    <p className="text-xs text-gray-400 mt-1">14:46</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Pricing */}
       <section id="pricing" className="py-24 px-4 bg-gray-50">
         <div className="max-w-5xl mx-auto">
@@ -112,7 +197,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
-                name: "Стартер", price: "Бесплатно", period: "навсегда",
+                name: "Базовый", price: "Бесплатно", period: "навсегда",
                 color: "border-gray-200", badge: null as string | null,
                 features: ["100 товаров", "2 сотрудника", "1 филиал", "Базовые продажи", "Учёт склада", "Расходы и доходы"],
               },
@@ -122,12 +207,12 @@ export default function LandingPage() {
                 features: ["2,000 товаров", "10 сотрудников", "Долговые продажи", "Поставщики", "База клиентов", "Экспорт CSV"],
               },
               {
-                name: "Про", price: "7,500,000", period: "сум/мес",
+                name: "Про", price: "5,000,000", period: "сум/мес",
                 color: "border-purple-500 shadow-xl shadow-purple-100", badge: "Лучший выбор" as string | null,
-                features: ["Безлимит товаров", "5 филиалов", "AI Копилот", "CRM + бонусы", "ABC анализ", "SMS уведомления"],
+                features: ["Безлимит товаров", "5 филиалов", "AI Копилот", "CRM + бонусы", "Inventory Management", "SMS уведомления"],
               },
               {
-                name: "Корпорат", price: "15,000,000", period: "сум/мес",
+                name: "Корпорат", price: "10,000,000", period: "сум/мес",
                 color: "border-gray-200", badge: null as string | null,
                 features: ["Безлимит всего", "Интеграция 1С", "Маркетплейсы", "TSD терминалы", "API доступ", "Персональный менеджер"],
               },
@@ -149,7 +234,7 @@ export default function LandingPage() {
                   ))}
                 </ul>
                 <Link href="/register" className={`block text-center py-2.5 rounded-xl text-sm font-semibold transition-all ${plan.name === "Про" ? "bg-purple-600 hover:bg-purple-700 text-white" : "border border-gray-200 text-gray-700 hover:bg-gray-50"}`}>
-                  {plan.name === "Стартер" ? "Начать бесплатно" : "Попробовать 30 дней"}
+                  {plan.name === "Базовый" ? "Начать бесплатно" : "Попробовать 30 дней"}
                 </Link>
               </div>
             ))}

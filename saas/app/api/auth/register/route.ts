@@ -40,8 +40,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Телефон уже зарегистрирован" }, { status: 400 });
     }
 
-    // Find premium plan for trial
-    const premiumPlan = await prisma.subscriptionPlan.findUnique({ where: { slug: "premium" } });
+    // Find pro plan for trial (fall back to any active plan if pro doesn't exist)
+    const premiumPlan =
+      (await prisma.subscriptionPlan.findUnique({ where: { slug: "pro" } })) ??
+      (await prisma.subscriptionPlan.findFirst({ where: { isActive: true }, orderBy: { sortOrder: "desc" } }));
     if (!premiumPlan) {
       return NextResponse.json({ error: "Тарифные планы не настроены" }, { status: 500 });
     }
