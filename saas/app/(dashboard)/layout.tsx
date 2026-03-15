@@ -5,6 +5,7 @@ import { AICopilot } from "@/components/ai/AICopilot";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { NotificationBadge } from "@/components/layout/NotificationBadge";
 import { WelcomeBanner } from "@/components/layout/WelcomeBanner";
+import { TrialBanner } from "@/components/layout/TrialBanner";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -33,16 +34,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
-      {showTrialBanner && (
-        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-white text-center py-2 px-4 text-sm font-medium flex items-center justify-center gap-3">
-          <span>
-            ⏱ Пробный период: осталось {trialDaysLeft}{" "}
-            {trialDaysLeft === 1 ? "день" : trialDaysLeft < 5 ? "дня" : "дней"}
-          </span>
-          <span className="text-amber-200">•</span>
-          <span>Выберите тариф чтобы продолжить работу</span>
-        </div>
-      )}
+      {showTrialBanner && <TrialBanner daysLeft={trialDaysLeft} />}
       <Sidebar
         user={{
           fullName: user.fullName,
