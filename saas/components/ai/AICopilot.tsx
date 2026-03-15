@@ -186,6 +186,14 @@ export function AICopilot({ user, pageData }: AICopilotProps) {
           }
           try {
             const parsed = JSON.parse(data);
+            if (parsed.error) {
+              setMessages(prev => {
+                const updated = [...prev];
+                updated[updated.length - 1] = { role: "assistant", content: `❌ Ошибка AI: ${parsed.error}` };
+                return updated;
+              });
+              return;
+            }
             if (parsed.text) {
               fullContent += parsed.text;
               setMessages(prev => {
@@ -198,6 +206,17 @@ export function AICopilot({ user, pageData }: AICopilotProps) {
             // skip malformed chunks
           }
         }
+      }
+      // If stream ended without any content or [DONE], show fallback
+      if (!fullContent) {
+        setMessages(prev => {
+          const updated = [...prev];
+          const last = updated[updated.length - 1];
+          if (last?.isStreaming) {
+            updated[updated.length - 1] = { role: "assistant", content: "Нет ответа от AI. Проверьте OPENAI_API_KEY." };
+          }
+          return updated;
+        });
       }
     } catch (err) {
       if ((err as Error).name === "AbortError") return;
