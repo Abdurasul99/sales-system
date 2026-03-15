@@ -129,7 +129,7 @@ export default function LoginPage() {
         </Suspense>
 
         <p className="text-center text-sm text-gray-400 mt-6">
-          © 2024 Sales System · Система управления продажами
+          © 2026 Sales System · Система управления продажами
         </p>
       </div>
     </div>

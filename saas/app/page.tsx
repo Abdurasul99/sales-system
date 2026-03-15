@@ -281,7 +281,7 @@ export default function LandingPage() {
             </div>
             <span className="text-white font-bold">Sales System</span>
           </div>
-          <p className="text-sm">© 2025 Sales System. Сделано в Узбекистане 🇺🇿</p>
+          <p className="text-sm">© 2026 Sales System. Сделано в Узбекистане 🇺🇿</p>
           <div className="flex gap-4 text-sm">
             <Link href="/login" className="hover:text-white">Войти</Link>
             <Link href="/register" className="hover:text-white">Регистрация</Link>
