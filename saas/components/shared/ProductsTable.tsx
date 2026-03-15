@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Search, Edit, Trash2, Package, AlertTriangle, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { useState, useMemo, useCallback } from "react";
+import { Plus, Search, Edit, Trash2, Package, AlertTriangle, CheckCircle, XCircle, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn, formatUzs, formatDate } from "@/lib/utils";
 import toast from "react-hot-toast";
 
@@ -41,9 +41,13 @@ export function ProductsTable({
   categories: { id: string; name: string }[];
   organizationId: string;
 }) {
+  const PAGE_SIZE = 20;
+
   const [products, setProducts] = useState(initialProducts);
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "active" | "inactive">("all");
+  const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [saving, setSaving] = useState(false);
@@ -52,12 +56,26 @@ export function ProductsTable({
     costPrice: "", sellingPrice: "", minStockLevel: "0", description: "",
   });
 
-  const filtered = products.filter((p) => {
-    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
-      p.barcode?.includes(search) || p.sku?.toLowerCase().includes(search.toLowerCase());
+  // Debounce search input
+  const debounceTimer = useCallback((val: string) => {
+    setSearch(val);
+    clearTimeout((debounceTimer as unknown as { _t?: ReturnType<typeof setTimeout> })._t);
+    (debounceTimer as unknown as { _t?: ReturnType<typeof setTimeout> })._t = setTimeout(() => {
+      setDebouncedSearch(val);
+      setPage(1);
+    }, 300);
+  }, []);
+
+  const filtered = useMemo(() => products.filter((p) => {
+    const q = debouncedSearch.toLowerCase();
+    const matchSearch = !q || p.name.toLowerCase().includes(q) ||
+      p.barcode?.includes(debouncedSearch) || p.sku?.toLowerCase().includes(q);
     const matchStatus = filterStatus === "all" || (filterStatus === "active" ? p.isActive : !p.isActive);
     return matchSearch && matchStatus;
-  });
+  }), [products, debouncedSearch, filterStatus]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   function openCreate() {
     setEditProduct(null);
@@ -102,7 +120,7 @@ export function ProductsTable({
               className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
               placeholder="Поиск по названию, штрихкоду..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => debounceTimer(e.target.value)}
             />
           </div>
           <select
@@ -162,7 +180,7 @@ export function ProductsTable({
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((p) => (
+                {paginated.map((p) => (
                   <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50/40 transition-colors">
                     <td className="px-6 py-3">
                       <div className="flex items-center gap-3">
@@ -215,6 +233,43 @@ export function ProductsTable({
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-3 border-t border-gray-50 bg-gray-50/30">
+            <p className="text-xs text-gray-400">
+              {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} из {filtered.length}
+            </p>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" />
+              </button>
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                const p = totalPages <= 5 ? i + 1 : Math.max(1, Math.min(page - 2, totalPages - 4)) + i;
+                return (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={cn(
+                      "w-7 h-7 rounded-lg text-xs font-medium",
+                      p === page ? "bg-purple-600 text-white" : "border border-gray-200 text-gray-500 hover:bg-gray-100"
+                    )}
+                  >{p}</button>
+                );
+              })}
+              <button
+                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                <ChevronRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         )}
       </div>
