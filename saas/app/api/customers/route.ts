@@ -23,11 +23,20 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const session = await getSessionFromRequest(req);
   if (!session?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { name, phone, email } = await req.json();
-  if (!name) return NextResponse.json({ error: "name required" }, { status: 400 });
+  const body = await req.json();
+  // Support both legacy "name" and new "fullName"
+  const fullName = body.fullName || body.name;
+  const { phone, email, segment } = body;
+  if (!fullName) return NextResponse.json({ error: "fullName required" }, { status: 400 });
 
   const customer = await prisma.customer.create({
-    data: { organizationId: session.organizationId, fullName: name, phone: phone || null, email: email || null },
+    data: {
+      organizationId: session.organizationId,
+      fullName,
+      phone: phone || null,
+      email: email || null,
+      segment: segment || null,
+    },
   });
   return NextResponse.json(customer, { status: 201 });
 }

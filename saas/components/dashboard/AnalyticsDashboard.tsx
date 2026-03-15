@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   TrendingUp, TrendingDown, ShoppingCart, XCircle,
   AlertTriangle, DollarSign, BarChart2, Package,
+  Percent, ArrowRight,
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, BarChart, Bar, Cell,
+  Tooltip, ResponsiveContainer,
 } from "recharts";
-import { formatUzs, formatDate, PAYMENT_TYPE_LABELS, STATUS_LABELS } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { formatUzs, formatDate, PAYMENT_TYPE_LABELS, STATUS_LABELS, cn } from "@/lib/utils";
 
 interface AnalyticsData {
   revenue: number;
@@ -53,8 +54,59 @@ type Period = "today" | "week" | "month";
 export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
   const [period, setPeriod] = useState<Period>("month");
 
-  const periodRevenue = period === "today" ? data.revenueToday : period === "week" ? data.revenueWeek : data.revenue;
-  const periodCount = period === "today" ? data.salesCountToday : period === "week" ? data.salesCountWeek : data.salesCountMonth;
+  const periodRevenue =
+    period === "today" ? data.revenueToday : period === "week" ? data.revenueWeek : data.revenue;
+  const periodCount =
+    period === "today"
+      ? data.salesCountToday
+      : period === "week"
+      ? data.salesCountWeek
+      : data.salesCountMonth;
+
+  const profitability =
+    data.revenue > 0 ? Math.round((data.profit / data.revenue) * 100 * 10) / 10 : 0;
+
+  // AI insight cards
+  const insights: { color: string; bg: string; border: string; text: string }[] = [];
+  if (data.profit < 0) {
+    insights.push({
+      color: "text-red-700",
+      bg: "bg-red-50",
+      border: "border-red-200",
+      text: "Расходы превышают доходы в этом месяце",
+    });
+  }
+  if (data.lowStockCount > 0) {
+    insights.push({
+      color: "text-orange-700",
+      bg: "bg-orange-50",
+      border: "border-orange-200",
+      text: `${data.lowStockCount} товаров заканчивается на складе`,
+    });
+  }
+  if (data.cancelledSales > 0) {
+    insights.push({
+      color: "text-yellow-700",
+      bg: "bg-yellow-50",
+      border: "border-yellow-200",
+      text: `${data.cancelledSales} продаж отменено в этом месяце`,
+    });
+  }
+  if (data.salesCountToday === 0) {
+    insights.push({
+      color: "text-blue-700",
+      bg: "bg-blue-50",
+      border: "border-blue-200",
+      text: "Сегодня ещё нет продаж",
+    });
+  } else if (data.salesCountToday > 5) {
+    insights.push({
+      color: "text-green-700",
+      bg: "bg-green-50",
+      border: "border-green-200",
+      text: `Активный день: ${data.salesCountToday} продаж сегодня`,
+    });
+  }
 
   const statCards = [
     {
@@ -98,13 +150,20 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
       border: "border-orange-100",
     },
     {
-      label: "Мало на складе",
-      value: data.lowStockCount.toLocaleString("ru-RU"),
-      icon: AlertTriangle,
-      color: "text-yellow-600",
-      bg: "bg-yellow-50",
-      border: "border-yellow-100",
+      label: "Доходность",
+      value: `${profitability}%`,
+      icon: Percent,
+      color: profitability >= 0 ? "text-teal-600" : "text-red-600",
+      bg: profitability >= 0 ? "bg-teal-50" : "bg-red-50",
+      border: profitability >= 0 ? "border-teal-100" : "border-red-100",
     },
+  ];
+
+  const quickActions = [
+    { label: "Добавить расход", href: "/expenses", color: "bg-red-50 text-red-700 hover:bg-red-100 border-red-200" },
+    { label: "Добавить доход", href: "/income", color: "bg-green-50 text-green-700 hover:bg-green-100 border-green-200" },
+    { label: "Новая продажа", href: "/sales", color: "bg-purple-50 text-purple-700 hover:bg-purple-100 border-purple-200" },
+    { label: "Управление складом", href: "/warehouse", color: "bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-200" },
   ];
 
   if (data.salesCountMonth === 0 && data.expenses === 0) {
@@ -123,6 +182,26 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
 
   return (
     <div className="space-y-6">
+      {/* AI Insights */}
+      {insights.length > 0 && (
+        <div className="space-y-2">
+          {insights.map((insight, i) => (
+            <div
+              key={i}
+              className={cn(
+                "flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium",
+                insight.bg,
+                insight.border,
+                insight.color
+              )}
+            >
+              <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+              {insight.text}
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Period toggle */}
       <div className="flex items-center justify-between">
         <h2 className="text-base font-semibold text-gray-800">Обзор показателей</h2>
@@ -144,8 +223,8 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
         </div>
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+      {/* Stat cards — 3x2 desktop, 2x3 tablet, 1x6 mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
@@ -230,7 +309,9 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-gray-400 w-4">{i + 1}</span>
-                        <span className="text-sm text-gray-700 font-medium truncate max-w-[140px]">{p.name}</span>
+                        <span className="text-sm text-gray-700 font-medium truncate max-w-[140px]">
+                          {p.name}
+                        </span>
                       </div>
                       <span className="text-xs text-gray-500">{p.quantity.toFixed(0)} шт</span>
                     </div>
@@ -266,14 +347,19 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
                 <tr className="border-b border-gray-50">
                   <th className="text-left text-xs text-gray-400 font-medium px-6 py-3">Чек</th>
                   <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Кассир</th>
-                  <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Тип оплаты</th>
+                  <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">
+                    Тип оплаты
+                  </th>
                   <th className="text-left text-xs text-gray-400 font-medium px-4 py-3">Статус</th>
                   <th className="text-right text-xs text-gray-400 font-medium px-6 py-3">Сумма</th>
                 </tr>
               </thead>
               <tbody>
                 {data.recentSales.map((sale) => (
-                  <tr key={sale.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors">
+                  <tr
+                    key={sale.id}
+                    className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors"
+                  >
                     <td className="px-6 py-3">
                       <p className="font-medium text-gray-900">{sale.receiptNumber}</p>
                       <p className="text-xs text-gray-400">{formatDate(sale.createdAt)}</p>
@@ -283,7 +369,12 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
                       {PAYMENT_TYPE_LABELS[sale.paymentType] ?? sale.paymentType}
                     </td>
                     <td className="px-4 py-3">
-                      <span className={cn("px-2.5 py-1 rounded-lg text-xs font-medium", STATUS_STYLES[sale.status] ?? "bg-gray-100 text-gray-600")}>
+                      <span
+                        className={cn(
+                          "px-2.5 py-1 rounded-lg text-xs font-medium",
+                          STATUS_STYLES[sale.status] ?? "bg-gray-100 text-gray-600"
+                        )}
+                      >
                         {STATUS_LABELS[sale.status] ?? sale.status}
                       </span>
                     </td>
@@ -301,6 +392,26 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
             <p className="text-sm text-gray-400">Продажи отсутствуют</p>
           </div>
         )}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <h3 className="text-sm font-semibold text-gray-700 mb-4">Быстрые действия</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {quickActions.map((action) => (
+            <Link
+              key={action.href}
+              href={action.href}
+              className={cn(
+                "flex items-center justify-between px-4 py-3 rounded-xl border text-sm font-medium transition-colors",
+                action.color
+              )}
+            >
+              <span>{action.label}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );
