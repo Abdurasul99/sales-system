@@ -104,16 +104,6 @@ export async function POST(req: NextRequest) {
 
     // ── /stock ─────────────────────────────────────────────────────────────────
     if (text === "/stock") {
-      const lowStock = await prisma.inventory.findMany({
-        where: {
-          product: { organizationId: orgId },
-          quantity: { lte: prisma.inventory.fields.quantity }, // fallback below
-        },
-        include: { product: { select: { name: true, minStockLevel: true } } },
-        take: 10,
-      }).catch(() => [] as any[]);
-
-      // Manual low-stock filter
       const items = await prisma.$queryRaw<{ name: string; quantity: number; minStockLevel: number }[]>`
         SELECT p.name, i.quantity, p."minStockLevel"
         FROM "Inventory" i
