@@ -4,6 +4,7 @@ import { Header } from "@/components/layout/Header";
 import prisma from "@/lib/db/prisma";
 import { FinanceTable } from "@/components/shared/FinanceTable";
 import { startOfMonth } from "date-fns";
+import { CopilotDataProvider } from "@/components/ai/CopilotDataProvider";
 
 export default async function ExpensesPage() {
   const user = await getCurrentUser();
@@ -25,19 +26,24 @@ export default async function ExpensesPage() {
     }),
   ]);
 
+  const monthTotal = Number(stats._sum.amount ?? 0);
+  const monthCount = stats._count.id;
+
   return (
-    <div>
-      <Header title="Расходы" subtitle="Управление расходами" />
-      <div className="p-6">
-        <FinanceTable
-          records={expenses.map((e) => ({ id: e.id, description: e.description, amount: Number(e.amount), currency: e.currency, status: e.status, date: e.paidAt.toISOString(), categoryName: e.category?.name ?? "—", categoryColor: e.category?.color ?? "#7c3aed", createdBy: e.createdBy }))}
-          categories={categories.map((c) => ({ id: c.id, name: c.name }))}
-          monthTotal={Number(stats._sum.amount ?? 0)}
-          monthCount={stats._count.id}
-          type="expense"
-          organizationId={user.organizationId}
-        />
+    <CopilotDataProvider data={{ monthTotal, monthCount }}>
+      <div>
+        <Header title="Расходы" subtitle="Управление расходами" />
+        <div className="p-6">
+          <FinanceTable
+            records={expenses.map((e) => ({ id: e.id, description: e.description, amount: Number(e.amount), currency: e.currency, status: e.status, date: e.paidAt.toISOString(), categoryName: e.category?.name ?? "—", categoryColor: e.category?.color ?? "#7c3aed", createdBy: e.createdBy }))}
+            categories={categories.map((c) => ({ id: c.id, name: c.name }))}
+            monthTotal={monthTotal}
+            monthCount={monthCount}
+            type="expense"
+            organizationId={user.organizationId}
+          />
+        </div>
       </div>
-    </div>
+    </CopilotDataProvider>
   );
 }

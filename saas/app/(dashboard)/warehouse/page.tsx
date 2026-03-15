@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Search, Package, ArrowDown, ArrowUp, AlertTriangle } from "lucide-react";
 import toast from "react-hot-toast";
+import { CopilotDataProvider } from "@/components/ai/CopilotDataProvider";
 
 interface InventoryItem {
   id: string;
@@ -66,8 +67,13 @@ export default function WarehousePage() {
   };
 
   const lowStockCount = inventory.filter(i => Number(i.quantity) <= i.product.minStockLevel).length;
+  const totalItems = inventory.filter(i => Number(i.quantity) > 0).length;
+  const lowStockItems = inventory
+    .filter(i => Number(i.quantity) <= i.product.minStockLevel)
+    .map(i => ({ name: i.product.name, qty: Number(i.quantity), min: i.product.minStockLevel }));
 
   return (
+    <CopilotDataProvider data={{ totalItems, lowStockCount, lowStockItems }}>
     <div className="p-4 md:p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
@@ -253,5 +259,6 @@ export default function WarehousePage() {
         </div>
       )}
     </div>
+    </CopilotDataProvider>
   );
 }

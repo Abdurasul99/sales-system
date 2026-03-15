@@ -1,16 +1,27 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import {
   TrendingUp, TrendingDown, ShoppingCart, XCircle,
   AlertTriangle, DollarSign, BarChart2, Package,
   Percent, ArrowRight,
 } from "lucide-react";
-import {
-  AreaChart, Area, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer,
-} from "recharts";
+import type { ComponentType } from "react";
+
+// Lazy-load recharts to avoid SSR bundle bloat
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mkDynamic = <T,>(loader: () => Promise<T>) =>
+  dynamic(loader as () => Promise<ComponentType>, { ssr: false }) as ComponentType<any>;
+
+const AreaChart = mkDynamic(() => import("recharts").then((m) => m.AreaChart));
+const Area = mkDynamic(() => import("recharts").then((m) => m.Area));
+const XAxis = mkDynamic(() => import("recharts").then((m) => m.XAxis));
+const YAxis = mkDynamic(() => import("recharts").then((m) => m.YAxis));
+const CartesianGrid = mkDynamic(() => import("recharts").then((m) => m.CartesianGrid));
+const Tooltip = mkDynamic(() => import("recharts").then((m) => m.Tooltip));
+const ResponsiveContainer = mkDynamic(() => import("recharts").then((m) => m.ResponsiveContainer));
 import { formatUzs, formatDate, PAYMENT_TYPE_LABELS, STATUS_LABELS, cn } from "@/lib/utils";
 
 interface AnalyticsData {
@@ -50,6 +61,27 @@ const STATUS_STYLES: Record<string, string> = {
 const COLORS = ["#7c3aed", "#a855f7", "#c084fc", "#d8b4fe", "#e9d5ff"];
 
 type Period = "today" | "week" | "month";
+
+function ExportButton({ type, label }: { type: string; label: string }) {
+  const [loading, setLoading] = useState(false);
+  async function handleExport() {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/export?type=${type}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = `${type}.csv`; a.click();
+      URL.revokeObjectURL(url);
+    } finally { setLoading(false); }
+  }
+  return (
+    <button onClick={handleExport} disabled={loading} className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50">
+      {loading ? <span className="w-3.5 h-3.5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" /> : <span>↓</span>}
+      {label}
+    </button>
+  );
+}
 
 export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
   const [period, setPeriod] = useState<Period>("month");
@@ -182,6 +214,14 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
 
   return (
     <div className="space-y-6">
+      {/* Export buttons */}
+      <div className="flex flex-wrap gap-2 mt-3">
+        <ExportButton type="sales" label="Продажи CSV" />
+        <ExportButton type="products" label="Товары CSV" />
+        <ExportButton type="expenses" label="Расходы CSV" />
+        <ExportButton type="customers" label="Клиенты CSV" />
+      </div>
+
       {/* AI Insights */}
       {insights.length > 0 && (
         <div className="space-y-2">
@@ -265,19 +305,19 @@ export function AnalyticsDashboard({ data }: { data: AnalyticsData }) {
                 <XAxis
                   dataKey="date"
                   tick={{ fontSize: 11, fill: "#9ca3af" }}
-                  tickFormatter={(v) => v.slice(8)}
+                  tickFormatter={(v: string) => v.slice(8)}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
                   tick={{ fontSize: 11, fill: "#9ca3af" }}
-                  tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`}
+                  tickFormatter={(v: number) => `${(v / 1000000).toFixed(1)}M`}
                   axisLine={false}
                   tickLine={false}
                 />
                 <Tooltip
                   formatter={(v: number) => [formatUzs(v), "Выручка"]}
-                  labelFormatter={(l) => `Дата: ${l}`}
+                  labelFormatter={(l: string) => `Дата: ${l}`}
                   contentStyle={{ borderRadius: "12px", border: "1px solid #e5e7eb", fontSize: 12 }}
                 />
                 <Area

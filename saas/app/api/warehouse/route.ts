@@ -85,8 +85,38 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return inv;
+    return { inv, after };
   });
 
-  return NextResponse.json(result, { status: 201 });
+  // Check low stock and create notification
+  const newQuantity = result.after;
+  const updatedProductId = result.inv.productId;
+  const stockProduct = await prisma.product.findUnique({
+    where: { id: updatedProductId },
+    select: { name: true, minStockLevel: true, organizationId: true },
+  });
+  if (stockProduct && newQuantity <= (stockProduct.minStockLevel ?? 5)) {
+    // Check if a LOW_STOCK notification was created in last 24h to avoid spam
+    const recentNotif = await prisma.notification.findFirst({
+      where: {
+        organizationId: stockProduct.organizationId,
+        type: "LOW_STOCK",
+        data: { path: ["productId"], equals: updatedProductId },
+        createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+      },
+    });
+    if (!recentNotif) {
+      await prisma.notification.create({
+        data: {
+          organizationId: stockProduct.organizationId,
+          type: "LOW_STOCK",
+          title: "Товар заканчивается",
+          message: `${stockProduct.name}: осталось ${newQuantity} шт. Пополните запасы.`,
+          data: { productId: updatedProductId },
+        },
+      });
+    }
+  }
+
+  return NextResponse.json(result.inv, { status: 201 });
 }

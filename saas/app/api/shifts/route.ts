@@ -73,6 +73,7 @@ export async function PATCH(req: NextRequest) {
 
   const shift = await prisma.cashierShift.findFirst({
     where: { id: shiftId, cashierId: userId, status: "OPEN" },
+    include: { branch: { select: { organizationId: true } } },
   });
   if (!shift) {
     return NextResponse.json({ error: "Смена не найдена или уже закрыта" }, { status: 404 });
@@ -103,6 +104,21 @@ export async function PATCH(req: NextRequest) {
       notes: notes || null,
     },
   });
+
+  // Create shift closed notification
+  const orgId = shift.branch.organizationId;
+  if (orgId) {
+    const formattedAmount = totalSales.toLocaleString("ru-RU");
+    await prisma.notification.create({
+      data: {
+        organizationId: orgId,
+        type: "SUCCESS",
+        title: "Смена закрыта",
+        message: `Смена закрыта. Продаж: ${salesCount} · Итого: ${formattedAmount} сум`,
+        data: { shiftId: shift.id },
+      },
+    });
+  }
 
   return NextResponse.json({ ...updated, salesCount });
 }

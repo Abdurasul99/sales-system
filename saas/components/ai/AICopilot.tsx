@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PAGE_SUGGESTIONS } from "@/lib/ai/copilot-context";
+import { useCopilotData } from "./CopilotDataProvider";
 
 interface Message {
   role: "user" | "assistant";
@@ -68,6 +69,8 @@ function getPageFromPath(pathname: string): string {
 export function AICopilot({ user, pageData }: AICopilotProps) {
   const pathname = usePathname();
   const currentPage = getPageFromPath(pathname);
+  const contextData = useCopilotData();
+  const effectivePageData = pageData ?? contextData;
   const pageTitle = PAGE_TITLES[currentPage] ?? "Система";
 
   const [isOpen, setIsOpen] = useState(false);
@@ -138,7 +141,7 @@ export function AICopilot({ user, pageData }: AICopilotProps) {
           pageContext: {
             page: currentPage,
             pageTitle,
-            data: pageData ?? {},
+            data: effectivePageData ?? {},
           },
           history,
         }),
@@ -205,7 +208,7 @@ export function AICopilot({ user, pageData }: AICopilotProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [messages, isLoading, currentPage, pageTitle, pageData, isOpen]);
+  }, [messages, isLoading, currentPage, pageTitle, effectivePageData, isOpen]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {

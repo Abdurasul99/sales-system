@@ -40,6 +40,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "ПРОДАЖИ",
     items: [
       { label: "Аналитика", href: "/analytics", icon: BarChart3, roles: ["ADMIN"] },
+      { label: "ABC Анализ", href: "/abc", icon: TrendingUp, roles: ["ADMIN"] },
       { label: "Продажи", href: "/sales", icon: ShoppingCart, roles: ["ADMIN", "CASHIER"] },
       { label: "Смены", href: "/shifts", icon: Clock, roles: ["ADMIN", "CASHIER"] },
     ],

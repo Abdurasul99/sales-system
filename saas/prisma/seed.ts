@@ -9,11 +9,11 @@ async function main() {
   // ─── Plans ──────────────────────────────────────────────────────────────────
   const plans = await Promise.all([
     prisma.subscriptionPlan.upsert({
-      where: { slug: "basic" },
-      update: { priceUzs: 2000000, maxProducts: 500, maxEmployees: 5, maxBranches: 1, maxWorkstations: 2 },
+      where: { slug: "starter" },
+      update: { priceUzs: 0, maxProducts: 100, maxEmployees: 2, maxBranches: 1, maxWorkstations: 1 },
       create: {
-        name: "Basic", slug: "basic", priceUzs: 2000000, maxProducts: 500,
-        maxEmployees: 5, maxBranches: 1, maxWorkstations: 2, sortOrder: 1,
+        name: "Стартер", slug: "starter", priceUzs: 0, maxProducts: 100,
+        maxEmployees: 2, maxBranches: 1, maxWorkstations: 1, sortOrder: 1,
         features: {
           create: [
             { feature: "ANALYTICS_BASIC", enabled: true },
@@ -31,11 +31,11 @@ async function main() {
       },
     }),
     prisma.subscriptionPlan.upsert({
-      where: { slug: "plus" },
-      update: { priceUzs: 5000000, maxProducts: 5000, maxEmployees: 15, maxBranches: 2, maxWorkstations: 5 },
+      where: { slug: "biznes" },
+      update: { priceUzs: 990000, maxProducts: 2000, maxEmployees: 10, maxBranches: 1, maxWorkstations: 5 },
       create: {
-        name: "Plus", slug: "plus", priceUzs: 5000000, maxProducts: 5000,
-        maxEmployees: 15, maxBranches: 2, maxWorkstations: 5, sortOrder: 2,
+        name: "Бизнес", slug: "biznes", priceUzs: 990000, maxProducts: 2000,
+        maxEmployees: 10, maxBranches: 1, maxWorkstations: 5, sortOrder: 2,
         features: {
           create: [
             { feature: "ANALYTICS_BASIC", enabled: true },
@@ -61,11 +61,11 @@ async function main() {
       },
     }),
     prisma.subscriptionPlan.upsert({
-      where: { slug: "premium" },
-      update: { priceUzs: 10000000, maxBranches: 5, maxWorkstations: 20 },
+      where: { slug: "pro" },
+      update: { priceUzs: 7500000, maxProducts: null, maxEmployees: null, maxBranches: 5, maxWorkstations: 20 },
       create: {
-        name: "Premium", slug: "premium", priceUzs: 10000000,
-        maxBranches: 5, maxWorkstations: 20, sortOrder: 3,
+        name: "Про", slug: "pro", priceUzs: 7500000,
+        maxProducts: null, maxEmployees: null, maxBranches: 5, maxWorkstations: 20, sortOrder: 3,
         features: {
           create: [
             { feature: "ANALYTICS_BASIC", enabled: true },
@@ -100,10 +100,11 @@ async function main() {
       },
     }),
     prisma.subscriptionPlan.upsert({
-      where: { slug: "platinum" },
-      update: { priceUzs: 20000000 },
+      where: { slug: "korporat" },
+      update: { priceUzs: 15000000, maxProducts: null, maxEmployees: null, maxBranches: null, maxWorkstations: null },
       create: {
-        name: "Platinum", slug: "platinum", priceUzs: 20000000, sortOrder: 4,
+        name: "Корпорат", slug: "korporat", priceUzs: 15000000,
+        maxProducts: null, maxEmployees: null, maxBranches: null, maxWorkstations: null, sortOrder: 4,
         features: {
           create: [
             { feature: "ANALYTICS_BASIC", enabled: true },
@@ -173,7 +174,7 @@ async function main() {
   console.log("✅ SuperAdmin created — login: superadmin / Admin123!");
 
   // ─── Demo Organization ────────────────────────────────────────────────────────
-  const premiumPlan = plans.find((p) => p.slug === "premium")!;
+  const premiumPlan = plans.find((p) => p.slug === "pro")!;
 
   const demoOrg = await prisma.organization.upsert({
     where: { slug: "magazia-demo" },

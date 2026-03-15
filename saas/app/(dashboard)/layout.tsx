@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
-import { Bell } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth/session";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { AICopilot } from "@/components/ai/AICopilot";
+import { GlobalSearch } from "@/components/search/GlobalSearch";
+import { NotificationBadge } from "@/components/layout/NotificationBadge";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -54,9 +54,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
         {/* Mobile top bar */}
         <div className="lg:hidden h-14 shrink-0 bg-white border-b border-gray-100 flex items-center px-4 gap-3">
           <span className="text-sm font-semibold text-gray-700 flex-1 text-center pl-10">{user.organization?.name ?? "Sales System"}</span>
-          <Link href="/notifications" className="relative p-2 rounded-lg hover:bg-gray-100">
-            <Bell className="w-5 h-5 text-gray-600" />
-          </Link>
+          <GlobalSearch />
+          <NotificationBadge />
+        </div>
+        {/* Desktop search bar */}
+        <div className="hidden lg:flex items-center px-6 py-3 border-b border-gray-50 bg-white">
+          <GlobalSearch />
         </div>
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>

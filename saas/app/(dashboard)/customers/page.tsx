@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Plus, Search, User, Phone, Mail, ShoppingBag, AlertTriangle, Star, ChevronRight, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatUzs, cn } from "@/lib/utils";
+import { CopilotDataProvider } from "@/components/ai/CopilotDataProvider";
 
 interface Customer {
   id: string;
@@ -114,6 +115,7 @@ export default function CustomersPage() {
   ];
 
   return (
+    <CopilotDataProvider data={{ totalCustomers: customers.length, totalDebt }}>
     <div className="p-4 md:p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
@@ -453,5 +455,6 @@ export default function CustomersPage() {
         </div>
       )}
     </div>
+    </CopilotDataProvider>
   );
 }

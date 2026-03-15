@@ -5,6 +5,7 @@ import { AnalyticsDashboard } from "@/components/dashboard/AnalyticsDashboard";
 import { OnboardingCheck } from "@/components/onboarding/OnboardingCheck";
 import prisma from "@/lib/db/prisma";
 import { startOfDay, startOfWeek, startOfMonth, endOfDay } from "date-fns";
+import { CopilotDataProvider } from "@/components/ai/CopilotDataProvider";
 
 export default async function AnalyticsPage() {
   const user = await getCurrentUser();
@@ -156,12 +157,24 @@ export default async function AnalyticsPage() {
   };
 
   return (
-    <div>
-      <Header title="Аналитика" subtitle="Обзор продаж и финансов" />
-      <div className="p-4 md:p-6">
-        <AnalyticsDashboard data={analytics} />
+    <CopilotDataProvider data={{
+      revenue,
+      expenses,
+      profit,
+      salesCountToday: analytics.salesCountToday,
+      salesCountWeek: analytics.salesCountWeek,
+      salesCountMonth: analytics.salesCountMonth,
+      cancelledSales,
+      lowStockCount,
+      topProducts: topProductsWithNames.map((p) => ({ name: p.name, total: p.total })),
+    }}>
+      <div>
+        <Header title="Аналитика" subtitle="Обзор продаж и финансов" />
+        <div className="p-4 md:p-6">
+          <AnalyticsDashboard data={analytics} />
+        </div>
+        <OnboardingCheck hasProducts={productCount > 0} organizationId={user.organizationId!} />
       </div>
-      <OnboardingCheck hasProducts={productCount > 0} organizationId={user.organizationId!} />
-    </div>
+    </CopilotDataProvider>
   );
 }
