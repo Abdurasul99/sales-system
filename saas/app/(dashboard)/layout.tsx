@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { AICopilot } from "@/components/ai/AICopilot";
 import { GlobalSearch } from "@/components/search/GlobalSearch";
 import { NotificationBadge } from "@/components/layout/NotificationBadge";
+import { WelcomeBanner } from "@/components/layout/WelcomeBanner";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
@@ -61,6 +62,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <div className="hidden lg:flex items-center px-6 py-3 border-b border-gray-50 bg-white">
           <GlobalSearch />
         </div>
+        {/* Welcome banner — shows once after registration, dismissed by user */}
+        <WelcomeBanner />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
       {/* AI Copilot — context is set per page via data-* attrs; layout provides user */}

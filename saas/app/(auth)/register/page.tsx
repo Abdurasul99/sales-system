@@ -51,8 +51,9 @@ export default function RegisterPage() {
         toast.error(data.error || "Ошибка регистрации");
         return;
       }
-      toast.success("Аккаунт создан! 30 дней бесплатно.");
-      setTimeout(() => router.push("/login"), 1500);
+      // Mark new account in sessionStorage — dashboard will show a persistent welcome banner
+      sessionStorage.setItem("newAccount", "1");
+      router.push("/login");
     } catch {
       toast.error("Ошибка сервера");
     } finally {
