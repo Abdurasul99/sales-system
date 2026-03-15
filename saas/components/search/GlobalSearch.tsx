@@ -47,10 +47,11 @@ export function GlobalSearch() {
     timerRef.current = setTimeout(async () => {
       try {
         const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+        if (!res.ok) { setLoading(false); return; }
         const data = await res.json();
         setResults(data);
         setSelected(0);
-      } finally { setLoading(false); }
+      } catch { /* network error */ } finally { setLoading(false); }
     }, 300);
   }, []);
 

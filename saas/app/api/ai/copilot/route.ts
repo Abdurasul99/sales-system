@@ -4,7 +4,12 @@ import { getSessionFromRequest } from "@/lib/auth/session";
 import { buildSystemPrompt, type UserContext, type PageContext } from "@/lib/ai/copilot-context";
 import prisma from "@/lib/db/prisma";
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? "" });
+// Lazy client — only created when API key is confirmed present
+function getOpenAIClient(): OpenAI {
+  const key = process.env.OPENAI_API_KEY;
+  if (!key) throw new Error("OPENAI_API_KEY not set");
+  return new OpenAI({ apiKey: key });
+}
 
 export async function POST(req: NextRequest) {
   const session = await getSessionFromRequest(req);
@@ -74,7 +79,7 @@ export async function POST(req: NextRequest) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        const completion = await openai.chat.completions.create({
+        const completion = await getOpenAIClient().chat.completions.create({
           model: "gpt-4o-mini",
           stream: true,
           temperature: 0.4,

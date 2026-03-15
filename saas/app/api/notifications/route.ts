@@ -95,7 +95,16 @@ export async function PATCH(req: NextRequest) {
   if (!organizationId) return NextResponse.json({ error: "No organization" }, { status: 400 });
 
   const body = await req.json();
-  const { id } = body;
+  const { id, all } = body;
+
+  // Mark all unread as read
+  if (all === true) {
+    const result = await prisma.notification.updateMany({
+      where: { organizationId, isRead: false },
+      data: { isRead: true },
+    });
+    return NextResponse.json({ success: true, updated: result.count });
+  }
 
   if (!id) {
     return NextResponse.json({ error: "id обязателен" }, { status: 400 });

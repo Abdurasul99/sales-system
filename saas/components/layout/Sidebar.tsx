@@ -339,9 +339,10 @@ export function Sidebar({ user }: SidebarProps) {
         {/* User section */}
         <div className="border-t border-gray-100 p-3">
           {user.planName && !collapsed && (
-            <div className="px-3 py-2 bg-purple-50 rounded-xl mb-2">
-              <p className="text-xs text-purple-600 font-medium">Тариф: {user.planName}</p>
-            </div>
+            <a href="/billing" className="block px-3 py-2 bg-purple-50 hover:bg-purple-100 rounded-xl mb-2 transition-colors group">
+              <p className="text-xs text-purple-600 font-medium group-hover:text-purple-700">Тариф: {user.planName}</p>
+              <p className="text-[10px] text-purple-400 mt-0.5">Управление подпиской →</p>
+            </a>
           )}
           <div className="flex items-center gap-3 px-3 py-2">
             <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
