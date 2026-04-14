@@ -1,290 +1,274 @@
 import Link from "next/link";
-import { BarChart3, Package, ShoppingCart, Users, Zap, Shield, Globe, ArrowRight, CheckCircle, Sparkles, TrendingUp, Bell, Smartphone, Send } from "lucide-react";
+import {
+  BarChart3,
+  Package,
+  ShoppingCart,
+  Truck,
+  Users,
+  TrendingUp,
+  Shield,
+  Globe,
+  ArrowRight,
+  CheckCircle2,
+  Building2,
+  Warehouse,
+  DollarSign,
+  ClipboardList,
+} from "lucide-react";
+
+const features = [
+  {
+    icon: ShoppingCart,
+    title: "Продажи и касса",
+    desc: "Кассовые смены, возвраты, смешанная оплата, долги клиентов. Полный контроль над каждой транзакцией.",
+  },
+  {
+    icon: Warehouse,
+    title: "Склад и запасы",
+    desc: "Остатки в реальном времени, движения товаров, ABC-анализ, контроль минимального уровня запасов.",
+  },
+  {
+    icon: Truck,
+    title: "Закупки",
+    desc: "Заказы поставщикам, приёмка товара, контроль задолженностей и история поставок.",
+  },
+  {
+    icon: Users,
+    title: "Клиенты и CRM",
+    desc: "База клиентов, сегментация, бонусная система, история покупок и задолженности.",
+  },
+  {
+    icon: DollarSign,
+    title: "Финансы",
+    desc: "Доходы, расходы, курсы валют, cashflow. Понимайте прибыльность своего бизнеса.",
+  },
+  {
+    icon: BarChart3,
+    title: "Аналитика",
+    desc: "Выручка, прибыль, топ товаров, сравнение периодов. Решения на основе данных.",
+  },
+  {
+    icon: Building2,
+    title: "Мультифилиальность",
+    desc: "Управляйте несколькими точками продаж из одного интерфейса с разграничением прав.",
+  },
+  {
+    icon: Shield,
+    title: "Роли и безопасность",
+    desc: "Администратор, кассир, кладовщик — каждый видит только то, что ему нужно.",
+  },
+  {
+    icon: Globe,
+    title: "Три языка",
+    desc: "Интерфейс на русском, английском и узбекском. Переключение в один клик.",
+  },
+];
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Nav */}
-      <nav className="border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
+    <div className="min-h-screen bg-white text-slate-900">
+      {/* Navigation */}
+      <nav className="sticky top-0 z-50 bg-white border-b border-gray-100">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-600 text-white">
+                <BarChart3 className="h-5 w-5" />
+              </div>
+              <span className="text-base font-bold text-gray-900">Sales System</span>
             </div>
-            <span className="font-bold text-gray-900 text-lg">Sales System</span>
-          </div>
-          <div className="hidden md:flex items-center gap-6 text-sm text-gray-500">
-            <a href="#features" className="hover:text-gray-900">Возможности</a>
-            <a href="#pricing" className="hover:text-gray-900">Тарифы</a>
-            <a href="#faq" className="hover:text-gray-900">FAQ</a>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="text-sm font-medium text-gray-600 hover:text-gray-900">Войти</Link>
-            <Link href="/register" className="bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold px-4 py-2 rounded-xl transition-all">
-              Попробовать бесплатно
-            </Link>
+            <div className="hidden items-center gap-8 text-sm font-medium text-gray-600 md:flex">
+              <a href="#features" className="hover:text-gray-900 transition-colors">Возможности</a>
+              <a href="#contact" className="hover:text-gray-900 transition-colors">Контакты</a>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link href="/login" className="hidden sm:block text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">
+                Войти
+              </Link>
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700 transition-colors"
+              >
+                Попробовать бесплатно
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
         </div>
       </nav>
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-purple-50 via-white to-indigo-50 pt-20 pb-24 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
-            <Zap className="w-3.5 h-3.5" />
-            30 дней бесплатно — без карты
+      <section className="px-4 pt-16 pb-20 sm:px-6 lg:px-8 lg:pt-24 lg:pb-28 bg-gradient-to-b from-purple-50/50 to-white">
+        <div className="mx-auto max-w-4xl text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-purple-200 bg-purple-50 px-4 py-1.5 text-xs font-semibold text-purple-700 mb-6">
+            <span className="h-1.5 w-1.5 rounded-full bg-purple-500 animate-pulse" />
+            ERP / CRM / Складской учёт для бизнеса
           </div>
-          <h1 className="text-4xl md:text-6xl font-black text-gray-900 leading-tight mb-6">
-            Система учёта<br />
-            <span className="text-purple-600">для вашего магазина</span>
+          <h1 className="text-4xl font-black tracking-tight text-gray-900 sm:text-5xl lg:text-6xl leading-tight">
+            Система управления
+            <span className="text-purple-600"> продажами и бизнесом</span>
           </h1>
-          <p className="text-xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Продажи, склад, расходы, клиенты и аналитика в одном месте.<br />
-            Для магазинов Узбекистана и СНГ.
+          <p className="mt-6 text-lg leading-8 text-gray-600 max-w-2xl mx-auto">
+            Всё необходимое для управления торговлей — в одном веб-приложении.
+            Продажи, склад, закупки, CRM, финансы и аналитика для розничного и оптового бизнеса.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register" className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-4 rounded-2xl text-lg flex items-center justify-center gap-2 shadow-xl shadow-purple-200 transition-all hover:scale-105">
-              Начать бесплатно <ArrowRight className="w-5 h-5" />
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/register"
+              className="inline-flex items-center gap-2 rounded-xl bg-purple-600 px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-purple-200 hover:bg-purple-700 transition-colors"
+            >
+              Начать бесплатно — 1 месяц
+              <ArrowRight className="h-5 w-5" />
             </Link>
-            <Link href="/login" className="border border-gray-200 text-gray-700 font-semibold px-8 py-4 rounded-2xl text-lg flex items-center justify-center gap-2 hover:bg-gray-50 transition-all">
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 rounded-xl border border-gray-200 px-6 py-3.5 text-base font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+            >
               Войти в систему
             </Link>
           </div>
-          <p className="text-sm text-gray-400 mt-4">Уже 200+ магазинов доверяют нам · Данные в облаке · Без установки</p>
-        </div>
-      </section>
-
-      {/* Stats bar */}
-      <section className="bg-purple-600 py-8 px-4">
-        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center text-white">
-          {[
-            { value: "200+", label: "Магазинов" },
-            { value: "30 дней", label: "Бесплатный период" },
-            { value: "24/7", label: "Доступность" },
-            { value: "UZS", label: "Основная валюта" },
-          ].map((s) => (
-            <div key={s.label}>
-              <p className="text-3xl font-black">{s.value}</p>
-              <p className="text-purple-200 text-sm mt-1">{s.label}</p>
-            </div>
-          ))}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-gray-500">
+            {["Без установки", "Облачное хранение данных", "Поддержка 3 языков", "Мультифилиальность"].map((item) => (
+              <div key={item} className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Features */}
-      <section id="features" className="py-24 px-4">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">Всё что нужно магазину</h2>
-            <p className="text-gray-500 text-lg">Один сервис вместо Excel, тетради и WhatsApp</p>
+      <section id="features" className="px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">
+              Всё для управления бизнесом
+            </h2>
+            <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+              Комплексное решение для розничной и оптовой торговли в Узбекистане
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              { icon: ShoppingCart, color: "bg-purple-50 text-purple-600", title: "Кассовый терминал (POS)", desc: "Быстрые продажи с поиском по штрихкоду. Наличные, карта, долг, смешанная оплата. Печать чека." },
-              { icon: Package, color: "bg-blue-50 text-blue-600", title: "Учёт склада", desc: "Остатки в реальном времени. Поступление товаров от поставщиков. Уведомления при низком остатке." },
-              { icon: BarChart3, color: "bg-green-50 text-green-600", title: "Аналитика и отчёты", desc: "Выручка, расходы, прибыль. Топ-товары. ABC анализ. Экспорт в Excel/CSV." },
-              { icon: Users, color: "bg-orange-50 text-orange-600", title: "База клиентов", desc: "Учёт долгов, бонусная система, кэшбэк. История покупок каждого клиента." },
-              { icon: Sparkles, color: "bg-pink-50 text-pink-600", title: "AI Копилот", desc: "Умный ассистент знает ваш бизнес. Отвечает на вопросы по складу, продажам и расходам." },
-              { icon: Globe, color: "bg-teal-50 text-teal-600", title: "Мультивалютность", desc: "UZS основная валюта. Поддержка USD, EUR, RUB, CNY с автообновлением курсов." },
-              { icon: Bell, color: "bg-yellow-50 text-yellow-600", title: "Уведомления", desc: "Оповещения о низком складе, закрытии смены, долгах клиентов. В системе и Telegram." },
-              { icon: Shield, color: "bg-red-50 text-red-600", title: "Роли и доступы", desc: "Разные права для владельца, кассира, кладовщика. Каждый видит только своё." },
-              { icon: Smartphone, color: "bg-indigo-50 text-indigo-600", title: "Мобильный доступ", desc: "Работает на телефоне и планшете. Кассир продаёт с телефона. Владелец видит сводку." },
-            ].map((f) => (
-              <div key={f.title} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                <div className={`w-12 h-12 ${f.color} rounded-xl flex items-center justify-center mb-4`}>
-                  <f.icon className="w-6 h-6" />
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f) => {
+              const Icon = f.icon;
+              return (
+                <div key={f.title} className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-50 mb-4">
+                    <Icon className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <h3 className="text-base font-bold text-gray-900 mb-2">{f.title}</h3>
+                  <p className="text-sm leading-6 text-gray-600">{f.desc}</p>
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{f.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed">{f.desc}</p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Telegram Bot */}
-      <section className="py-20 px-4 bg-gradient-to-br from-sky-50 to-indigo-50">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
-            <div className="flex-1">
-              <div className="inline-flex items-center gap-2 bg-sky-100 text-sky-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-5">
-                <Send className="w-3.5 h-3.5" />
-                Telegram Bot
-              </div>
-              <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
-                Управляйте бизнесом<br />прямо в Telegram
+      {/* Modules overview */}
+      <section className="px-4 py-16 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-8 lg:grid-cols-2 items-center">
+            <div>
+              <h2 className="text-3xl font-black tracking-tight text-gray-900 sm:text-4xl">
+                Полный контроль над торговлей
               </h2>
-              <p className="text-gray-500 text-lg mb-8 leading-relaxed">
-                Получайте сводку продаж, остатки склада и уведомления об операциях —
-                без входа в систему. Всё в вашем любимом мессенджере.
+              <p className="mt-4 text-lg text-gray-600">
+                От кассы до управленческой отчётности — все данные в одном месте, без Excel и разрозненных таблиц.
               </p>
-              <div className="space-y-4 mb-8">
+              <div className="mt-8 space-y-4">
                 {[
-                  { icon: "📊", title: "Ежедневная сводка", desc: "Выручка, прибыль и топ-товары дня — каждое утро в 9:00" },
-                  { icon: "📦", title: "Уведомления о складе", desc: "Мгновенные оповещения когда товар заканчивается" },
-                  { icon: "💰", title: "Итоги продаж", desc: "Получайте отчёт по каждой смене сразу после закрытия" },
-                  { icon: "🤖", title: "AI ассистент в чате", desc: "Задавайте вопросы о бизнесе прямо в Telegram" },
-                ].map((item) => (
-                  <div key={item.title} className="flex items-start gap-3">
-                    <span className="text-2xl">{item.icon}</span>
-                    <div>
-                      <p className="font-semibold text-gray-900 text-sm">{item.title}</p>
-                      <p className="text-gray-500 text-sm">{item.desc}</p>
+                  { icon: ClipboardList, text: "Учёт продаж с поддержкой наличных, карты, долгов и смешанной оплаты" },
+                  { icon: Package, text: "Складской учёт с историей движений и ABC-классификацией товаров" },
+                  { icon: TrendingUp, text: "Финансовая аналитика: выручка, прибыль, расходы в режиме реального времени" },
+                  { icon: Users, text: "CRM с историей клиентов, бонусами и анализом задолженностей" },
+                ].map(({ icon: Icon, text }) => (
+                  <div key={text} className="flex items-start gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 shrink-0 mt-0.5">
+                      <Icon className="h-4 w-4 text-purple-600" />
                     </div>
+                    <p className="text-sm leading-6 text-gray-700">{text}</p>
                   </div>
                 ))}
               </div>
-              <Link
-                href="/register"
-                className="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg shadow-sky-200"
-              >
-                <Send className="w-4 h-4" />
-                Попробовать бесплатно
-              </Link>
             </div>
-            <div className="flex-shrink-0">
-              <div className="w-72 bg-white rounded-3xl shadow-2xl shadow-sky-100 p-5 border border-sky-100">
-                {/* Fake Telegram UI */}
-                <div className="flex items-center gap-3 pb-4 border-b border-gray-100 mb-4">
-                  <div className="w-10 h-10 bg-sky-500 rounded-full flex items-center justify-center">
-                    <Send className="w-5 h-5 text-white" />
+            <div className="rounded-2xl bg-slate-900 p-6 text-white shadow-xl">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-3 w-3 rounded-full bg-red-500" />
+                <div className="h-3 w-3 rounded-full bg-yellow-500" />
+                <div className="h-3 w-3 rounded-full bg-green-500" />
+                <span className="ml-2 text-xs text-slate-400 font-mono">analytics dashboard</span>
+              </div>
+              <div className="space-y-3">
+                {[
+                  { label: "Выручка сегодня", value: "4 850 000 UZS", warn: false },
+                  { label: "Продаж", value: "47", warn: false },
+                  { label: "Средний чек", value: "103 191 UZS", warn: false },
+                  { label: "Товаров мало", value: "3 позиции", warn: true },
+                  { label: "Прибыль за месяц", value: "12 340 000 UZS", warn: false },
+                ].map((row) => (
+                  <div key={row.label} className="flex items-center justify-between rounded-lg bg-white/5 px-4 py-2.5">
+                    <span className="text-sm text-slate-300">{row.label}</span>
+                    <span className={`text-sm font-bold ${row.warn ? "text-amber-400" : "text-white"}`}>{row.value}</span>
                   </div>
-                  <div>
-                    <p className="font-bold text-gray-900 text-sm">Sales System Bot</p>
-                    <p className="text-xs text-green-500">в сети</p>
-                  </div>
-                </div>
-                <div className="space-y-3 text-sm">
-                  <div className="bg-sky-50 rounded-2xl rounded-tl-sm p-3">
-                    <p className="font-semibold text-gray-800 mb-1">📊 Итоги за сегодня</p>
-                    <p className="text-gray-600">Выручка: <span className="font-bold text-gray-900">4,250,000 сум</span></p>
-                    <p className="text-gray-600">Прибыль: <span className="font-bold text-green-600">1,820,000 сум</span></p>
-                    <p className="text-gray-600">Продаж: <span className="font-bold text-gray-900">38 чеков</span></p>
-                    <p className="text-xs text-gray-400 mt-2">14:30</p>
-                  </div>
-                  <div className="bg-orange-50 rounded-2xl rounded-tl-sm p-3">
-                    <p className="font-semibold text-gray-800">⚠️ Низкий остаток</p>
-                    <p className="text-gray-600 text-xs mt-1">Coca-Cola 1.5л — осталось 3 шт.</p>
-                    <p className="text-xs text-gray-400 mt-1">14:45</p>
-                  </div>
-                  <div className="bg-gray-100 rounded-2xl rounded-tr-sm p-3 ml-8">
-                    <p className="text-gray-700">Покажи топ-5 товаров</p>
-                    <p className="text-xs text-gray-400 mt-1">14:46</p>
-                  </div>
-                  <div className="bg-sky-50 rounded-2xl rounded-tl-sm p-3">
-                    <p className="font-semibold text-gray-800 mb-1">🏆 Топ-5 товаров сегодня:</p>
-                    <p className="text-gray-600 text-xs">1. Coca-Cola 1.5л — 12 шт</p>
-                    <p className="text-gray-600 text-xs">2. Чипсы Lays — 9 шт</p>
-                    <p className="text-gray-600 text-xs">3. Молоко Тошсут — 8 шт</p>
-                    <p className="text-xs text-gray-400 mt-1">14:46</p>
-                  </div>
-                </div>
+                ))}
+              </div>
+              <div className="mt-4 rounded-lg bg-purple-600/20 border border-purple-500/30 px-4 py-3">
+                <p className="text-xs text-purple-200">Обновлено только что · Нажмите для детального отчёта →</p>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="py-24 px-4 bg-gray-50">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">Простые и честные тарифы</h2>
-            <p className="text-gray-500 text-lg">Начните бесплатно. Платите только когда убедитесь что система работает.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                name: "Базовый", price: "Бесплатно", period: "навсегда",
-                color: "border-gray-200", badge: null as string | null,
-                features: ["100 товаров", "2 сотрудника", "1 филиал", "Базовые продажи", "Учёт склада", "Расходы и доходы"],
-              },
-              {
-                name: "Бизнес", price: "990,000", period: "сум/мес",
-                color: "border-gray-200", badge: "Популярный" as string | null,
-                features: ["2,000 товаров", "10 сотрудников", "Долговые продажи", "Поставщики", "База клиентов", "Экспорт CSV"],
-              },
-              {
-                name: "Про", price: "5,000,000", period: "сум/мес",
-                color: "border-purple-500 shadow-xl shadow-purple-100", badge: "Лучший выбор" as string | null,
-                features: ["Безлимит товаров", "5 филиалов", "AI Копилот", "CRM + бонусы", "Inventory Management", "SMS уведомления"],
-              },
-              {
-                name: "Корпорат", price: "10,000,000", period: "сум/мес",
-                color: "border-gray-200", badge: null as string | null,
-                features: ["Безлимит всего", "Интеграция 1С", "Маркетплейсы", "TSD терминалы", "API доступ", "Персональный менеджер"],
-              },
-            ].map((plan) => (
-              <div key={plan.name} className={`bg-white border-2 ${plan.color} rounded-2xl p-6 relative`}>
-                {plan.badge && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full">{plan.badge}</div>
-                )}
-                <h3 className="font-black text-gray-900 text-lg mb-1">{plan.name}</h3>
-                <div className="mb-4">
-                  <span className="text-2xl font-black text-gray-900">{plan.price}</span>
-                  <span className="text-gray-400 text-sm ml-1">{plan.period}</span>
-                </div>
-                <ul className="space-y-2 mb-6">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-green-500 shrink-0" />{f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/register" className={`block text-center py-2.5 rounded-xl text-sm font-semibold transition-all ${plan.name === "Про" ? "bg-purple-600 hover:bg-purple-700 text-white" : "border border-gray-200 text-gray-700 hover:bg-gray-50"}`}>
-                  {plan.name === "Базовый" ? "Начать бесплатно" : "Попробовать 30 дней"}
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section id="faq" className="py-24 px-4">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-black text-gray-900 text-center mb-12">Часто задаваемые вопросы</h2>
-          <div className="space-y-4">
-            {[
-              { q: "Нужна ли карта для пробного периода?", a: "Нет. Регистрация бесплатна, карта не требуется. 30 дней полного доступа к тарифу Про." },
-              { q: "Что будет с данными после окончания пробного периода?", a: "Ваши данные сохраняются. Перейдите в режим только для чтения — выберите тариф чтобы продолжить работу. Данные хранятся 90 дней после окончания." },
-              { q: "Работает ли система на телефоне?", a: "Да. Касса оптимизирована для работы на телефоне и планшете. Сканирование штрихкода через камеру." },
-              { q: "Можно ли работать с несколькими магазинами?", a: "Да. На тарифе Про поддерживается до 5 филиалов, на Корпорат — безлимитное количество." },
-              { q: "Есть ли интеграция с принтером чеков?", a: "Да, поддерживаются термопринтеры через Bluetooth и USB (Epson, BIXOLON и другие)." },
-            ].map((item) => (
-              <div key={item.q} className="border border-gray-100 rounded-2xl p-6">
-                <h3 className="font-semibold text-gray-900 mb-2">{item.q}</h3>
-                <p className="text-gray-500 text-sm">{item.a}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="bg-gradient-to-br from-purple-600 to-indigo-700 py-20 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-black text-white mb-4">Начните прямо сейчас</h2>
-          <p className="text-purple-200 text-lg mb-8">30 дней бесплатно. Настройка за 5 минут. Без договоров.</p>
-          <Link href="/register" className="bg-white text-purple-600 font-black px-10 py-4 rounded-2xl text-lg inline-flex items-center gap-2 hover:bg-purple-50 transition-all shadow-xl">
-            Создать аккаунт бесплатно <ArrowRight className="w-5 h-5" />
-          </Link>
+      <section className="px-4 py-16 sm:px-6 lg:px-8 bg-purple-600">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-3xl font-black text-white sm:text-4xl">
+            Готовы начать?
+          </h2>
+          <p className="mt-4 text-lg text-purple-100">
+            Попробуйте Sales System бесплатно — 1 месяц без ограничений. Без кредитной карты.
+          </p>
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              href="/register"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-purple-600 hover:bg-purple-50 transition-colors shadow-lg"
+            >
+              Зарегистрироваться бесплатно
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+            <Link
+              href="/login"
+              className="inline-flex items-center gap-2 rounded-xl border border-purple-400 px-6 py-3.5 text-base font-semibold text-white hover:bg-purple-700 transition-colors"
+            >
+              Войти в систему
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-10 px-4">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-purple-600 rounded-md flex items-center justify-center">
-              <Sparkles className="w-3 h-3 text-white" />
+      <footer id="contact" className="border-t border-gray-100 bg-white px-4 py-10 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-600 text-white">
+                <BarChart3 className="h-4 w-4" />
+              </div>
+              <span className="text-sm font-bold text-gray-900">Sales System</span>
             </div>
-            <span className="text-white font-bold">Sales System</span>
+            <p className="text-sm text-gray-500 text-center">
+              ERP/CRM система управления торговлей для бизнеса в Узбекистане
+            </p>
+            <div className="flex items-center gap-4 text-sm text-gray-500">
+              <Link href="/login" className="hover:text-gray-900 transition-colors">Войти</Link>
+              <Link href="/register" className="hover:text-gray-900 transition-colors">Регистрация</Link>
+            </div>
           </div>
-          <p className="text-sm">© 2026 Sales System. Сделано в Узбекистане 🇺🇿</p>
-          <div className="flex gap-4 text-sm">
-            <Link href="/login" className="hover:text-white">Войти</Link>
-            <Link href="/register" className="hover:text-white">Регистрация</Link>
+          <div className="mt-6 border-t border-gray-100 pt-6 text-center text-xs text-gray-400">
+            © {new Date().getFullYear()} Sales System. Все права защищены.
           </div>
         </div>
       </footer>

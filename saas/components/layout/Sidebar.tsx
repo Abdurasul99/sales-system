@@ -40,7 +40,7 @@ const NAV_GROUPS: NavGroup[] = [
     label: "ПРОДАЖИ",
     items: [
       { label: "Аналитика", href: "/analytics", icon: BarChart3, roles: ["ADMIN"] },
-      { label: "Inventory Management", href: "/abc", icon: TrendingUp, roles: ["ADMIN"] },
+      { label: "Управление запасами", href: "/abc", icon: TrendingUp, roles: ["ADMIN"] },
       { label: "Продажи", href: "/sales", icon: ShoppingCart, roles: ["ADMIN", "CASHIER"] },
       { label: "Смены", href: "/shifts", icon: Clock, roles: ["ADMIN", "CASHIER"] },
     ],
@@ -75,7 +75,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: "РАБОТА",
+    label: "ОПЕРАЦИИ",
     items: [
       { label: "Поставщики", href: "/suppliers", icon: Truck, roles: ["ADMIN", "WAREHOUSE_CLERK"] },
       { label: "Клиенты", href: "/customers", icon: Users, roles: ["ADMIN", "CASHIER"] },
