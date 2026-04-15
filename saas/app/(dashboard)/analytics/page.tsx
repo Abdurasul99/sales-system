@@ -147,10 +147,10 @@ async function fetchAnalytics(orgId: string) {
       paymentType: s.paymentType,
       cashier: s.cashier.fullName,
       itemCount: s._count.items,
-      createdAt: s.createdAt.toISOString(),
+      createdAt: new Date(s.createdAt).toISOString(),
     })),
     salesByDay: salesByDay.map((d) => ({
-      date: d.date.toISOString().split("T")[0],
+      date: new Date(d.date).toISOString().split("T")[0],
       total: Number(d.total),
       count: Number(d.count),
     })),

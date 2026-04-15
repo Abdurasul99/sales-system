@@ -187,7 +187,7 @@ export async function GET(req: NextRequest) {
         dynamicReorderPoint: health.dynamicReorderPoint,
         stockStatus: health.stockStatus,
         stockValue,
-        lastSoldAt: velocity?.lastSoldAt?.toISOString() ?? null,
+        lastSoldAt: velocity?.lastSoldAt ? new Date(velocity.lastSoldAt).toISOString() : null,
         branch: record.branch,
         product: {
           id: record.product.id,

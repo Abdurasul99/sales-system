@@ -52,7 +52,7 @@ export default async function ProductsPage() {
     quantity: product.inventory.reduce((sum, inventory) => sum + Number(inventory.quantity), 0),
     isActive: product.isActive,
     imageUrl: product.imageUrl,
-    createdAt: product.createdAt.toISOString(),
+    createdAt: new Date(product.createdAt).toISOString(),
   }));
 
   const lowStockCount = data.filter((product) => product.quantity <= product.minStockLevel).length;
