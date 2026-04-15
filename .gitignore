@@ -2,9 +2,11 @@
 node_modules/
 .pnp
 .pnp.js
+.codex-deploy-temp/
 
 # Next.js
 saas/.next/
+saas/.next-build/
 saas/out/
 saas/.vercel
 
@@ -22,15 +24,24 @@ saas/.env.production
 # Build
 saas/dist/
 saas/build/
+saas/coverage/
+saas/tsconfig.tsbuildinfo
 
 # Logs
 *.log
 npm-debug.log*
+saas/.dev-server.log
+saas/.dev-server.err.log
 
 # OS
 .DS_Store
 Thumbs.db
 
 # Prisma
-saas/prisma/migrations/
-N8N/n8n-mcp/
+automation/n8n/n8n-mcp/
+
+# Local tooling
+saas/.codex-http/
+saas/.codex-cookies.txt
+saas/.playwright-cli/
+saas/.moai/

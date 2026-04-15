@@ -11,7 +11,6 @@ import {
 import type { ComponentType } from "react";
 
 // Lazy-load recharts to avoid SSR bundle bloat
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mkDynamic = <T,>(loader: () => Promise<T>) =>
   dynamic(loader as () => Promise<ComponentType>, { ssr: false }) as ComponentType<any>;
 

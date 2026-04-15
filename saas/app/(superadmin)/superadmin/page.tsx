@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import prisma from "@/lib/db/prisma";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getCurrentUserBasic as getCurrentUser } from "@/lib/auth/session";
 import { formatUzs, formatDate } from "@/lib/utils";
 import { Building2, Users, Crown, Activity, TrendingUp, CalendarDays } from "lucide-react";
 import { revalidatePath } from "next/cache";

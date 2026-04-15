@@ -31,7 +31,10 @@ export async function POST() {
     data: { telegramToken: token, telegramChatId: null },
   });
 
-  const botUsername = process.env.TELEGRAM_BOT_USERNAME ?? "salessystemuz_bot";
+  const botUsername =
+    process.env.TELEGRAM_BOT_USERNAME ??
+    process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME ??
+    "salessystemuz_bot";
 
   return NextResponse.json({
     token,

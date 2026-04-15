@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   BarChart3, ShoppingCart, Package, Tag, TrendingDown, TrendingUp,
   Truck, DollarSign, Users, Settings, LogOut, ChevronDown,
@@ -10,6 +10,9 @@ import {
   Clock, Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNotificationCount } from "@/components/providers/NotificationCountProvider";
+import { useLocale } from "@/components/providers/LocaleProvider";
+import type { Translations } from "@/lib/i18n";
 import toast from "react-hot-toast";
 
 interface SidebarProps {
@@ -22,107 +25,92 @@ interface SidebarProps {
 }
 
 interface NavItem {
-  label: string;
+  labelKey: keyof Translations["nav"];
   href: string;
   icon: React.ElementType;
   roles?: string[];
-  children?: { label: string; href: string }[];
+  children?: { labelKey: keyof Translations["nav"]; href: string }[];
   badge?: number;
 }
 
 interface NavGroup {
-  label: string;
+  groupKey: keyof Translations["nav"];
   items: NavItem[];
 }
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    label: "ПРОДАЖИ",
+    groupKey: "group_sales",
     items: [
-      { label: "Аналитика", href: "/analytics", icon: BarChart3, roles: ["ADMIN"] },
-      { label: "Управление запасами", href: "/abc", icon: TrendingUp, roles: ["ADMIN"] },
-      { label: "Продажи", href: "/sales", icon: ShoppingCart, roles: ["ADMIN", "CASHIER"] },
-      { label: "Смены", href: "/shifts", icon: Clock, roles: ["ADMIN", "CASHIER"] },
+      { labelKey: "analytics", href: "/analytics", icon: BarChart3, roles: ["ADMIN"] },
+      { labelKey: "inventory_management", href: "/abc", icon: TrendingUp, roles: ["ADMIN"] },
+      { labelKey: "sales", href: "/sales", icon: ShoppingCart, roles: ["ADMIN", "CASHIER"] },
+      { labelKey: "shifts", href: "/shifts", icon: Clock, roles: ["ADMIN", "CASHIER"] },
     ],
   },
   {
-    label: "СКЛАД",
+    groupKey: "group_warehouse",
     items: [
-      { label: "Товары", href: "/products", icon: Package, roles: ["ADMIN", "WAREHOUSE_CLERK"] },
-      { label: "Категории", href: "/categories", icon: Tag, roles: ["ADMIN"] },
-      { label: "Склад", href: "/warehouse", icon: Warehouse, roles: ["ADMIN", "WAREHOUSE_CLERK"] },
-      { label: "Закупки", href: "/purchases", icon: Truck, roles: ["ADMIN", "WAREHOUSE_CLERK"] },
+      { labelKey: "products", href: "/products", icon: Package, roles: ["ADMIN", "WAREHOUSE_CLERK"] },
+      { labelKey: "categories", href: "/categories", icon: Tag, roles: ["ADMIN"] },
+      { labelKey: "warehouse", href: "/warehouse", icon: Warehouse, roles: ["ADMIN", "WAREHOUSE_CLERK"] },
+      { labelKey: "purchases", href: "/purchases", icon: Truck, roles: ["ADMIN", "WAREHOUSE_CLERK"] },
     ],
   },
   {
-    label: "ФИНАНСЫ",
+    groupKey: "group_finance",
     items: [
       {
-        label: "Расходы", href: "/expenses", icon: TrendingDown, roles: ["ADMIN"],
+        labelKey: "expenses", href: "/expenses", icon: TrendingDown, roles: ["ADMIN"],
         children: [
-          { label: "Список расходов", href: "/expenses" },
-          { label: "Категории расходов", href: "/expenses/categories" },
+          { labelKey: "expense_list", href: "/expenses" },
+          { labelKey: "expense_categories", href: "/expenses/categories" },
         ],
       },
       {
-        label: "Доходы", href: "/income", icon: TrendingUp, roles: ["ADMIN"],
+        labelKey: "income", href: "/income", icon: TrendingUp, roles: ["ADMIN"],
         children: [
-          { label: "Список доходов", href: "/income" },
-          { label: "Категории доходов", href: "/income/categories" },
+          { labelKey: "income_list", href: "/income" },
+          { labelKey: "income_categories", href: "/income/categories" },
         ],
       },
-      { label: "Обмен валют", href: "/currency", icon: DollarSign, roles: ["ADMIN"] },
+      { labelKey: "currency", href: "/currency", icon: DollarSign, roles: ["ADMIN"] },
     ],
   },
   {
-    label: "ОПЕРАЦИИ",
+    groupKey: "group_operations",
     items: [
-      { label: "Поставщики", href: "/suppliers", icon: Truck, roles: ["ADMIN", "WAREHOUSE_CLERK"] },
-      { label: "Клиенты", href: "/customers", icon: Users, roles: ["ADMIN", "CASHIER"] },
-      { label: "Уведомления", href: "/notifications", icon: Bell, roles: ["ADMIN", "CASHIER", "WAREHOUSE_CLERK"] },
+      { labelKey: "suppliers", href: "/suppliers", icon: Truck, roles: ["ADMIN", "WAREHOUSE_CLERK"] },
+      { labelKey: "customers", href: "/customers", icon: Users, roles: ["ADMIN", "CASHIER"] },
+      { labelKey: "notifications", href: "/notifications", icon: Bell, roles: ["ADMIN", "CASHIER", "WAREHOUSE_CLERK"] },
     ],
   },
   {
-    label: "СИСТЕМА",
+    groupKey: "group_system",
     items: [
-      { label: "Настройки", href: "/settings", icon: Settings, roles: ["ADMIN"] },
+      { labelKey: "settings", href: "/settings", icon: Settings, roles: ["ADMIN"] },
     ],
   },
 ];
 
-const SUPERADMIN_ITEMS: NavItem[] = [
-  { label: "Обзор", href: "/superadmin", icon: LayoutDashboard },
-  { label: "Организации", href: "/superadmin/organizations", icon: Building2 },
-  { label: "Пользователи", href: "/superadmin/users", icon: UserCog },
-  { label: "Планы", href: "/superadmin/plans", icon: Crown },
-  { label: "Филиалы", href: "/superadmin/branches", icon: Building2 },
+const SUPERADMIN_ITEMS = [
+  { label: "Overview", href: "/superadmin", icon: LayoutDashboard },
+  { label: "Organizations", href: "/superadmin/organizations", icon: Building2 },
+  { label: "Users", href: "/superadmin/users", icon: UserCog },
+  { label: "Plans", href: "/superadmin/plans", icon: Crown },
+  { label: "Branches", href: "/superadmin/branches", icon: Building2 },
 ];
-
-const ROLE_LABELS: Record<string, string> = {
-  SUPERADMIN: "Супер Админ",
-  ADMIN: "Администратор",
-  CASHIER: "Кассир",
-  WAREHOUSE_CLERK: "Кладовщик",
-  SUPPLIER_CONTACT: "Поставщик",
-};
 
 export function Sidebar({ user }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useLocale();
   const [collapsed, setCollapsed] = useState(false);
   const [openGroups, setOpenGroups] = useState<string[]>([]);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const { count: unreadCount } = useNotificationCount();
 
   const isSuperAdmin = user.role === "SUPERADMIN";
-
-  useEffect(() => {
-    if (isSuperAdmin) return;
-    fetch("/api/notifications?unread=true")
-      .then((r) => r.ok ? r.json() : null)
-      .then((d) => { if (d && typeof d.count === "number") setUnreadCount(d.count); })
-      .catch(() => {});
-  }, [isSuperAdmin]);
 
   function toggleGroup(href: string) {
     setOpenGroups((prev) =>
@@ -132,7 +120,7 @@ export function Sidebar({ user }: SidebarProps) {
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
-    toast.success("Вы вышли из системы");
+    toast.success(t.common.logout);
     router.push("/login");
     router.refresh();
   }
@@ -147,7 +135,7 @@ export function Sidebar({ user }: SidebarProps) {
             </div>
             {!collapsed && (
               <div className="min-w-0">
-                <p className="font-bold text-gray-900 text-sm leading-tight">Sales System</p>
+                <p className="font-bold text-gray-900 text-sm leading-tight">{t.common.app_name}</p>
                 <p className="text-xs text-red-500 font-medium">SuperAdmin</p>
               </div>
             )}
@@ -190,13 +178,13 @@ export function Sidebar({ user }: SidebarProps) {
               {!collapsed && (
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">{user.fullName}</p>
-                  <p className="text-xs text-gray-400">{ROLE_LABELS[user.role] || user.role}</p>
+                  <p className="text-xs text-gray-400">{t.roles[user.role as keyof typeof t.roles] ?? user.role}</p>
                 </div>
               )}
               <button
                 onClick={handleLogout}
                 className="text-gray-400 hover:text-red-500 transition-colors"
-                title="Выйти"
+                title={t.common.logout}
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -215,7 +203,7 @@ export function Sidebar({ user }: SidebarProps) {
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="font-bold text-gray-900 text-sm leading-tight">Sales System</p>
+              <p className="font-bold text-gray-900 text-sm leading-tight">{t.common.app_name}</p>
               {user.organizationName && (
                 <p className="text-xs text-gray-400 truncate">{user.organizationName}</p>
               )}
@@ -238,10 +226,10 @@ export function Sidebar({ user }: SidebarProps) {
             if (filteredItems.length === 0) return null;
 
             return (
-              <div key={group.label} className="mb-3">
+              <div key={group.groupKey} className="mb-3">
                 {!collapsed && (
                   <p className="px-3 mb-1 text-[10px] font-semibold text-gray-400 tracking-wider uppercase">
-                    {group.label}
+                    {t.nav[group.groupKey]}
                   </p>
                 )}
                 <div className="space-y-0.5">
@@ -268,7 +256,7 @@ export function Sidebar({ user }: SidebarProps) {
                             <Icon className="w-4 h-4 flex-shrink-0" />
                             {!collapsed && (
                               <>
-                                <span className="flex-1 text-left">{item.label}</span>
+                                <span className="flex-1 text-left">{t.nav[item.labelKey]}</span>
                                 <ChevronDown
                                   className={cn(
                                     "w-3.5 h-3.5 transition-transform",
@@ -292,7 +280,7 @@ export function Sidebar({ user }: SidebarProps) {
                                       : "text-gray-500 hover:text-gray-800 hover:bg-gray-50"
                                   )}
                                 >
-                                  {child.label}
+                                  {t.nav[child.labelKey]}
                                 </Link>
                               ))}
                             </div>
@@ -321,7 +309,7 @@ export function Sidebar({ user }: SidebarProps) {
                         </div>
                         {!collapsed && (
                           <>
-                            <span className="flex-1">{item.label}</span>
+                            <span className="flex-1">{t.nav[item.labelKey]}</span>
                             {showBadge && (
                               <span className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0" />
                             )}
@@ -340,8 +328,8 @@ export function Sidebar({ user }: SidebarProps) {
         <div className="border-t border-gray-100 p-3">
           {user.planName && !collapsed && (
             <a href="/billing" className="block px-3 py-2 bg-purple-50 hover:bg-purple-100 rounded-xl mb-2 transition-colors group">
-              <p className="text-xs text-purple-600 font-medium group-hover:text-purple-700">Тариф: {user.planName}</p>
-              <p className="text-[10px] text-purple-400 mt-0.5">Управление подпиской →</p>
+              <p className="text-xs text-purple-600 font-medium group-hover:text-purple-700">{t.common.plan}: {user.planName}</p>
+              <p className="text-[10px] text-purple-400 mt-0.5">{t.common.manage_subscription}</p>
             </a>
           )}
           <div className="flex items-center gap-3 px-3 py-2">
@@ -353,13 +341,13 @@ export function Sidebar({ user }: SidebarProps) {
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">{user.fullName}</p>
-                <p className="text-xs text-gray-400">{ROLE_LABELS[user.role] || user.role}</p>
+                <p className="text-xs text-gray-400">{t.roles[user.role as keyof typeof t.roles] ?? user.role}</p>
               </div>
             )}
             <button
               onClick={handleLogout}
               className="text-gray-400 hover:text-red-500 transition-colors"
-              title="Выйти"
+              title={t.common.logout}
             >
               <LogOut className="w-4 h-4" />
             </button>

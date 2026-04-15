@@ -292,6 +292,8 @@ export const ru = {
     login_error: "Неверный логин или пароль",
     logged_out: "Вы вышли из системы",
   },
-} as const;
+};
 
+// Translations type uses `string` values so other locales can satisfy it.
+// Shape (keys) is still fully type-checked via `en: Translations` and `uz: Translations`.
 export type Translations = typeof ru;

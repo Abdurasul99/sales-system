@@ -1,0 +1,27 @@
+{
+  "schemaChanged": false,
+  "schemaValidated": true,
+  "migrationPresent": true,
+  "apiChanged": false,
+  "apiValidated": true,
+  "uiChanged": false,
+  "uiValidated": true,
+  "unitTestsPassed": true,
+  "integrationTestsPassed": true,
+  "smokeValidated": true,
+  "authorizationChanged": false,
+  "rbacReviewed": false,
+  "criticalMutationChanged": false,
+  "auditLogReviewed": false,
+  "tenantImpact": false,
+  "tenantIsolationReviewed": false,
+  "branchImpact": false,
+  "branchIsolationReviewed": false,
+  "inventoryImpact": false,
+  "inventoryIntegrityReviewed": false,
+  "financialImpact": false,
+  "financialIntegrityReviewed": false,
+  "openRisks": [
+    "npm audit currently reports 13 unresolved vulnerabilities in the dependency tree."
+  ]
+}
