@@ -299,10 +299,10 @@ export default function WarehousePage() {
             <div className="mt-5 rounded-2xl bg-gray-50 p-4">
               <p className="text-sm font-medium text-gray-900">Interpretation</p>
               <ul className="mt-3 space-y-2 text-sm text-gray-600">
-                <li>`OUT OF STOCK`: no sellable inventory remains.</li>
-                <li>`CRITICAL`: inventory is below minimum or safety stock.</li>
-                <li>`REORDER`: below reorder point; replenish soon.</li>
-                <li>`OVERSTOCK`: significantly above suggested target.</li>
+                <li><code className="rounded bg-red-100 px-1 py-0.5 text-xs font-semibold text-red-700">OUT OF STOCK</code>: no sellable inventory remains.</li>
+                <li><code className="rounded bg-orange-100 px-1 py-0.5 text-xs font-semibold text-orange-700">CRITICAL</code>: inventory is below minimum or safety stock.</li>
+                <li><code className="rounded bg-yellow-100 px-1 py-0.5 text-xs font-semibold text-yellow-700">REORDER</code>: below reorder point; replenish soon.</li>
+                <li><code className="rounded bg-blue-100 px-1 py-0.5 text-xs font-semibold text-blue-700">OVERSTOCK</code>: significantly above suggested target.</li>
               </ul>
             </div>
           </div>
