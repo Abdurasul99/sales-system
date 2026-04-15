@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     select: { name: true, minStockLevel: true, organizationId: true },
   });
   if (stockProduct && newQuantity <= (stockProduct.minStockLevel ?? 5)) {
-    // Check if a LOW_STOCK notification was created in last 24h to avoid spam
+    // Deduplicate: skip if a LOW_STOCK notification was created in the last 24 h for this product
     const recentNotif = await prisma.notification.findFirst({
       where: {
         organizationId: stockProduct.organizationId,
@@ -112,9 +112,9 @@ export async function POST(req: NextRequest) {
         data: {
           organizationId: stockProduct.organizationId,
           type: "LOW_STOCK",
-          title: "Товар заканчивается",
-          message: `${stockProduct.name}: осталось ${newQuantity} шт. Пополните запасы.`,
-          data: { productId: updatedProductId },
+          title: "low_stock",
+          message: `${stockProduct.name}: ${newQuantity} remaining`,
+          data: { productId: updatedProductId, quantity: newQuantity, minStockLevel: stockProduct.minStockLevel },
         },
       });
     }

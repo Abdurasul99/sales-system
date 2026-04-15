@@ -1,18 +1,24 @@
-import { getCurrentUser } from "@/lib/auth/session";
+import { getCurrentUserBasic as getCurrentUser } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import prisma from "@/lib/db/prisma";
 import { SuppliersTable } from "@/components/shared/SuppliersTable";
+import { unstable_cache } from "next/cache";
 
 export default async function SuppliersPage() {
   const user = await getCurrentUser();
   if (!user || !user.organizationId) redirect("/login");
 
-  const suppliers = await prisma.supplier.findMany({
-    where: { organizationId: user.organizationId },
-    include: { _count: { select: { purchases: true } } },
-    orderBy: { createdAt: "desc" },
-  });
+  const orgId = user.organizationId;
+  const suppliers = await unstable_cache(
+    () => prisma.supplier.findMany({
+      where: { organizationId: orgId },
+      include: { _count: { select: { purchases: true } } },
+      orderBy: { createdAt: "desc" },
+    }),
+    [`suppliers-${orgId}`],
+    { revalidate: 120, tags: [`suppliers-${orgId}`] }
+  )();
 
   return (
     <div>

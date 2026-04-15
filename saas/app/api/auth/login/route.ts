@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/db/prisma";
-import { createSession, setSessionCookie } from "@/lib/auth/session";
+import { createSessionForUser, setSessionCookie } from "@/lib/auth/session";
 
 // Simple in-memory rate limiter (resets on cold start; sufficient for serverless bursts)
 const loginAttempts = new Map<string, { count: number; resetAt: number }>();
@@ -54,13 +54,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Неверный логин или пароль" }, { status: 401 });
     }
 
-    // Update last active
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { lastActiveAt: new Date() },
-    });
+    // Fire-and-forget — don't block login on a non-critical timestamp update
+    prisma.user.update({ where: { id: user.id }, data: { lastActiveAt: new Date() } }).catch(() => {});
 
-    const token = await createSession(user.id);
+    const token = await createSessionForUser({
+      id: user.id,
+      role: user.role,
+      organizationId: user.organizationId,
+      branchId: user.branchId,
+    });
 
     const response = NextResponse.json({
       success: true,

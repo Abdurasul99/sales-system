@@ -1,1 +1,15 @@
 .vercel
+.next
+.next-build
+node_modules
+.env
+.env.local
+.env.*.local
+.codex-http
+.codex-cookies.txt
+.playwright-cli
+.moai
+.dev-server.log
+.dev-server.err.log
+coverage
+tsconfig.tsbuildinfo

@@ -8,9 +8,11 @@ const PUBLIC_PATHS = [
   "/api/auth/logout",
   "/api/auth/register",
   "/api/telegram/webhook",
+  "/api/cron/keepalive",
   "/api/cron/",
   "/offline",
 ];
+const PUBLIC_EXACT_PATHS = ["/"];
 const SUPERADMIN_PATHS = ["/superadmin"];
 const ADMIN_PATHS = [
   "/analytics",
@@ -25,11 +27,22 @@ const ADMIN_PATHS = [
   "/warehouse",
 ];
 
+// When running behind a reverse proxy (nginx), req.url may contain localhost.
+// Use the Host header (which nginx forwards as-is) to build correct redirect URLs.
+function getOrigin(req: NextRequest): string {
+  const forwardedHost = req.headers.get("x-forwarded-host");
+  const host = forwardedHost ?? req.headers.get("host") ?? req.nextUrl.host;
+  const proto =
+    req.headers.get("x-forwarded-proto") ??
+    (req.nextUrl.protocol.replace(":", "") || "http");
+  return `${proto}://${host}`;
+}
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Allow public paths
-  if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
+  if (PUBLIC_EXACT_PATHS.includes(pathname) || PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 
@@ -42,10 +55,11 @@ export async function middleware(req: NextRequest) {
   }
 
   const session = await getSessionFromRequest(req);
+  const origin = getOrigin(req);
 
   // Redirect to login if no session
   if (!session) {
-    const loginUrl = new URL("/login", req.url);
+    const loginUrl = new URL("/login", origin);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
@@ -53,7 +67,7 @@ export async function middleware(req: NextRequest) {
   // SuperAdmin-only paths
   if (SUPERADMIN_PATHS.some((p) => pathname.startsWith(p))) {
     if (session.role !== "SUPERADMIN") {
-      return NextResponse.redirect(new URL("/analytics", req.url));
+      return NextResponse.redirect(new URL("/analytics", origin));
     }
   }
 
@@ -63,7 +77,7 @@ export async function middleware(req: NextRequest) {
     session.role !== "SUPERADMIN" &&
     !session.organizationId
   ) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/login", origin));
   }
 
   return NextResponse.next();
@@ -71,6 +85,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|images|fonts).*)",
+    "/((?!_next/static|_next/image|favicon.ico|manifest.json|icon-192.png|icon-512.png|sw.js|images|fonts).*)",
   ],
 };

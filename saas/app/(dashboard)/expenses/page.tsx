@@ -1,10 +1,9 @@
-import { getCurrentUser } from "@/lib/auth/session";
+import { getCurrentUserBasic as getCurrentUser } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import prisma from "@/lib/db/prisma";
 import { FinanceTable } from "@/components/shared/FinanceTable";
 import { startOfMonth } from "date-fns";
-import { CopilotDataProvider } from "@/components/ai/CopilotDataProvider";
 
 export default async function ExpensesPage() {
   const user = await getCurrentUser();
@@ -30,20 +29,18 @@ export default async function ExpensesPage() {
   const monthCount = stats._count.id;
 
   return (
-    <CopilotDataProvider data={{ monthTotal, monthCount }}>
-      <div>
-        <Header title="Расходы" subtitle="Управление расходами" />
-        <div className="p-6">
-          <FinanceTable
-            records={expenses.map((e) => ({ id: e.id, description: e.description, amount: Number(e.amount), currency: e.currency, status: e.status, date: e.paidAt.toISOString(), categoryName: e.category?.name ?? "—", categoryColor: e.category?.color ?? "#7c3aed", createdBy: e.createdBy }))}
-            categories={categories.map((c) => ({ id: c.id, name: c.name }))}
-            monthTotal={monthTotal}
-            monthCount={monthCount}
-            type="expense"
-            organizationId={user.organizationId}
-          />
-        </div>
+    <div>
+      <Header title="Расходы" subtitle="Управление расходами" />
+      <div className="p-6">
+        <FinanceTable
+          records={expenses.map((e) => ({ id: e.id, description: e.description, amount: Number(e.amount), currency: e.currency, status: e.status, date: e.paidAt.toISOString(), categoryName: e.category?.name ?? "—", categoryColor: e.category?.color ?? "#7c3aed", createdBy: e.createdBy }))}
+          categories={categories.map((c) => ({ id: c.id, name: c.name }))}
+          monthTotal={monthTotal}
+          monthCount={monthCount}
+          type="expense"
+          organizationId={user.organizationId}
+        />
       </div>
-    </CopilotDataProvider>
+    </div>
   );
 }

@@ -242,7 +242,11 @@ export function SalesPOS({ products, categories, cashierId, branchId, organizati
                   >
                     <div className="aspect-square bg-gray-100 rounded-lg mb-2 flex items-center justify-center overflow-hidden">
                       {product.imageUrl ? (
-                        <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                        <>
+                          {/* Product images can come from arbitrary remote sources, so keep a plain img tag here. */}
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
+                        </>
                       ) : (
                         <span className="text-2xl">📦</span>
                       )}

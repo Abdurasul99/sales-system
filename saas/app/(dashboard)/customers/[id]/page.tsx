@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getCurrentUserBasic as getCurrentUser } from "@/lib/auth/session";
 import { Header } from "@/components/layout/Header";
 import prisma from "@/lib/db/prisma";
 import { formatUzs, formatDate, PAYMENT_TYPE_LABELS, STATUS_LABELS, cn } from "@/lib/utils";
