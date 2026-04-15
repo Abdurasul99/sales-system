@@ -242,9 +242,9 @@ BEGIN
         sale_id, v_org_id, v_branch_id, cashier_id,
         CASE WHEN i <= 10 THEN cust_ids[(i % 10) + 1] ELSE NULL END,
         receipt_no,
-        CASE WHEN i % 10 = 0 THEN 'CANCELLED' ELSE 'COMPLETED' END,
-        CASE i % 4 WHEN 0 THEN 'CASH' WHEN 1 THEN 'CARD'
-                   WHEN 2 THEN 'CASH' ELSE 'TRANSFER' END,
+        CASE WHEN i % 10 = 0 THEN 'CANCELLED'::"SaleStatus" ELSE 'COMPLETED'::"SaleStatus" END,
+        CASE i % 4 WHEN 0 THEN 'CASH'::"PaymentType" WHEN 1 THEN 'CARD'::"PaymentType"
+                   WHEN 2 THEN 'CASH'::"PaymentType" ELSE 'TRANSFER'::"PaymentType" END,
         total_amt, 0, total_amt, total_amt, 0,
         'UZS', sale_date, sale_date
       );
@@ -257,8 +257,8 @@ BEGIN
       IF i % 10 != 0 THEN
         INSERT INTO "Payment"(id, "saleId", amount, "paymentType", currency, "paidAt")
         VALUES (gen_random_uuid()::text, sale_id, total_amt,
-          CASE i % 4 WHEN 0 THEN 'CASH' WHEN 1 THEN 'CARD'
-                     WHEN 2 THEN 'CASH' ELSE 'TRANSFER' END,
+          CASE i % 4 WHEN 0 THEN 'CASH'::"PaymentType" WHEN 1 THEN 'CARD'::"PaymentType"
+                     WHEN 2 THEN 'CASH'::"PaymentType" ELSE 'TRANSFER'::"PaymentType" END,
           'UZS', sale_date);
       END IF;
     END LOOP;
