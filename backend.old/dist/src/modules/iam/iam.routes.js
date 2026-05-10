@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.iamRouter = void 0;
+const express_1 = require("express");
+const prisma_1 = require("../../lib/prisma");
+const auth_1 = require("../../middlewares/auth");
+const iam_controller_1 = require("./iam.controller");
+const router = (0, express_1.Router)();
+exports.iamRouter = router;
+const controller = new iam_controller_1.IamController(prisma_1.prisma);
+router.use(auth_1.requireAuth);
+router.get("/permissions", (0, auth_1.requirePermission)("role.manage"), controller.getPermissions);
+router.get("/roles", (0, auth_1.requirePermission)("user.manage"), controller.listRoles);
+router.post("/roles", (0, auth_1.requirePermission)("role.manage"), controller.createRole);

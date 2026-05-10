@@ -1,0 +1,11 @@
+const router = require('express').Router();
+const ctrl = require('../controllers/suppliers.controllers');
+const { verifyToken } = require('../middlewares/authorization');
+
+router.get('/', verifyToken, ctrl.list);
+router.get('/:id', verifyToken, ctrl.getById);
+router.post('/', verifyToken, ctrl.create);
+router.put('/:id', verifyToken, ctrl.update);
+router.delete('/:id', verifyToken, ctrl.remove);
+
+module.exports = router;

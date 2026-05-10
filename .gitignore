@@ -19,6 +19,11 @@ saas/.env.production
 # MCP config (has API keys)
 .mcp.json
 
+# SSH keys - NEVER commit
+*.pem
+*.ppk
+.ssh-key*
+
 # Build
 saas/dist/
 saas/build/

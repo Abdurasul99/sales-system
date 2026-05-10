@@ -1,0 +1,31 @@
+name: sales_system
+description: Sales System mobile/web client (MVVM + GetX)
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  get: ^4.6.6
+  get_storage: ^2.1.1
+  dio: ^5.5.0+1
+  intl: ^0.19.0
+  cupertino_icons: ^1.0.8
+  fl_chart: ^0.69.0
+  flutter_svg: ^2.0.10+1
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+  flutter_test:
+    sdk: flutter
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/

@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 280" fill="none">
+    <defs>
+        <linearGradient id="orbitViolet" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#C084FC"/>
+            <stop offset="50%" stop-color="#8B5CF6"/>
+            <stop offset="100%" stop-color="#6D28D9"/>
+        </linearGradient>
+        <radialGradient id="orbitCore" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#FFFFFF"/>
+            <stop offset="50%" stop-color="#E9D5FF"/>
+            <stop offset="100%" stop-color="#A855F7" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="orbitHalo" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#A855F7" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#A855F7" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="orbitNeon" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
+            <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+
+    <g transform="translate(140, 130)">
+        <circle cx="0" cy="0" r="110" fill="url(#orbitHalo)"/>
+
+        <g filter="url(#orbitNeon)">
+            <ellipse cx="0" cy="0" rx="76" ry="26" stroke="url(#orbitViolet)" stroke-width="3.5" fill="none"/>
+            <ellipse cx="0" cy="0" rx="76" ry="26" stroke="url(#orbitViolet)" stroke-width="3.5" fill="none" transform="rotate(60)"/>
+            <ellipse cx="0" cy="0" rx="76" ry="26" stroke="url(#orbitViolet)" stroke-width="3.5" fill="none" transform="rotate(-60)"/>
+        </g>
+
+        <g transform="rotate(0)">
+            <circle cx="76" cy="0" r="6.5" fill="#FFFFFF"/>
+        </g>
+        <g transform="rotate(60)">
+            <circle cx="76" cy="0" r="6.5" fill="#FFFFFF"/>
+        </g>
+        <g transform="rotate(-60)">
+            <circle cx="76" cy="0" r="6.5" fill="#FFFFFF"/>
+        </g>
+
+        <circle cx="0" cy="0" r="22" fill="url(#orbitCore)"/>
+        <circle cx="0" cy="0" r="9" fill="#FFFFFF"/>
+    </g>
+
+    <text x="140" y="262"
+          text-anchor="middle"
+          font-family="'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif"
+          font-size="12"
+          font-weight="700"
+          fill="#6D28D9"
+          letter-spacing="6">ERP · CRM </text>
+</svg>

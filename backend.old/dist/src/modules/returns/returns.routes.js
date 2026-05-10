@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.returnsRouter = void 0;
+const express_1 = require("express");
+const prisma_1 = require("../../lib/prisma");
+const auth_1 = require("../../middlewares/auth");
+const returns_controller_1 = require("./returns.controller");
+const router = (0, express_1.Router)();
+exports.returnsRouter = router;
+const controller = new returns_controller_1.ReturnsController(prisma_1.prisma);
+router.use(auth_1.requireAuth);
+router.get("/orders", (0, auth_1.requirePermission)("sales.read"), controller.list);
+router.post("/orders", (0, auth_1.requirePermission)("sales.write"), controller.create);
