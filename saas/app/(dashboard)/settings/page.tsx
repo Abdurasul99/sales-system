@@ -1,7 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Save, Building2, Bell, Shield, Send, Copy, Check, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Save, Building2, Bell, Shield, Send, Copy, Check, Loader2, CheckCircle, XCircle, Globe } from "lucide-react";
 import toast from "react-hot-toast";
+import { useLocale } from "@/components/providers/LocaleProvider";
+import type { Locale } from "@/lib/i18n";
 
 interface OrgSettings {
   name: string;
@@ -20,7 +22,7 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState<OrgSettings>({ name: "", phone: "", address: "", timezone: "Asia/Tashkent", primaryCurrency: "UZS" });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [tab, setTab] = useState<"general" | "notifications" | "security" | "telegram">("general");
+  const [tab, setTab] = useState<"general" | "notifications" | "security" | "telegram" | "language">("general");
 
   // Telegram state
   const [tg, setTg] = useState<TelegramStatus>({ connected: false, token: null });
@@ -81,11 +83,14 @@ export default function SettingsPage() {
 
   const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME ?? "salessystemuz_bot";
 
+  const { locale, setLocale } = useLocale();
+
   const tabs = [
     { id: "general", label: "Общие", icon: Building2 },
     { id: "notifications", label: "Уведомления", icon: Bell },
     { id: "telegram", label: "Telegram", icon: Send },
     { id: "security", label: "Безопасность", icon: Shield },
+    { id: "language", label: "Язык", icon: Globe },
   ] as const;
 
   return (
@@ -351,6 +356,41 @@ export default function SettingsPage() {
                     ))}
                   </div>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {tab === "language" && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="p-6 border-b border-gray-200">
+                <h2 className="font-semibold text-gray-900">Язык интерфейса</h2>
+                <p className="text-sm text-gray-500 mt-1">Выберите язык для отображения интерфейса</p>
+              </div>
+              <div className="p-6">
+                <div className="grid gap-3 max-w-sm">
+                  {([ ["ru", "Русский", "Основной язык интерфейса"], ["en", "English", "Interface language"], ["uz", "O'zbek", "Interfeys tili"] ] as [Locale, string, string][]).map(([code, label, hint]) => (
+                    <button
+                      key={code}
+                      onClick={() => { setLocale(code); toast.success(`Язык изменён на ${label}`); }}
+                      className={`flex items-center justify-between w-full px-4 py-3 rounded-xl border-2 text-left transition-all ${
+                        locale === code
+                          ? "border-purple-500 bg-purple-50"
+                          : "border-gray-200 hover:border-gray-300 bg-white"
+                      }`}
+                    >
+                      <div>
+                        <div className={`text-sm font-semibold ${locale === code ? "text-purple-700" : "text-gray-900"}`}>{label}</div>
+                        <div className="text-xs text-gray-500 mt-0.5">{hint}</div>
+                      </div>
+                      {locale === code && (
+                        <div className="w-5 h-5 bg-purple-600 rounded-full flex items-center justify-center shrink-0">
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-4 text-xs text-gray-400">Изменение языка применяется немедленно. Перезагрузка страницы не требуется.</p>
               </div>
             </div>
           )}

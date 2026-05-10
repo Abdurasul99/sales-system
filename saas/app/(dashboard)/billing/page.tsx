@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getCurrentUserBasic as getCurrentUser } from "@/lib/auth/session";
 import prisma from "@/lib/db/prisma";
 import { BillingClient } from "@/components/billing/BillingClient";
 

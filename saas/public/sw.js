@@ -1,11 +1,13 @@
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v3";
 const STATIC_CACHE = `sales-static-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `sales-dynamic-${CACHE_VERSION}`;
 
 // Critical pages to pre-cache for offline POS use
 const PRECACHE_URLS = [
-  "/offline",
+  "/offline.html",
   "/manifest.json",
+  "/icon-192.png",
+  "/icon-512.png",
 ];
 
 // Static asset extensions to cache-first
@@ -37,12 +39,8 @@ self.addEventListener("fetch", (event) => {
   // Skip non-GET, non-http(s), and browser-extension requests
   if (request.method !== "GET" || !url.protocol.startsWith("http")) return;
 
-  // Skip Next.js HMR and internal requests
-  if (url.pathname.startsWith("/_next/webpack-hmr")) return;
-  if (url.pathname.startsWith("/_next/static/")) {
-    event.respondWith(cacheFirst(request, STATIC_CACHE));
-    return;
-  }
+  // Never cache Next.js internals. In development this causes stale webpack/runtime chunks.
+  if (url.pathname.startsWith("/_next/")) return;
 
   // Static file extensions → cache-first
   if (STATIC_EXTENSIONS.test(url.pathname)) {
@@ -57,7 +55,7 @@ self.addEventListener("fetch", (event) => {
   }
 
   // Pages → network-first, fall back to offline page
-  event.respondWith(networkFirst(request, DYNAMIC_CACHE, "/offline"));
+  event.respondWith(networkFirst(request, DYNAMIC_CACHE, "/offline.html"));
 });
 
 async function cacheFirst(request, cacheName) {

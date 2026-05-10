@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/auth/session";
+import { getCurrentUserBasic as getCurrentUser } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/db/prisma";
 import { formatUzs } from "@/lib/utils";

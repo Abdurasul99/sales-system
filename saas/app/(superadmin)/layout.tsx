@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth/session";
+import { getCurrentUserBasic as getCurrentUser } from "@/lib/auth/session";
 import { Sidebar } from "@/components/layout/Sidebar";
 
 export default async function SuperAdminLayout({ children }: { children: React.ReactNode }) {

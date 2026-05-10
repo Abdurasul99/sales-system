@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: "Sales System",
   },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export const viewport: Viewport = {
@@ -27,7 +30,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body suppressHydrationWarning className={`${inter.variable} font-sans antialiased`}>
         <ServiceWorkerRegister />
         {children}
         <Toaster

@@ -1,0 +1,16 @@
+{
+  "name": "sales-system-repo",
+  "private": true,
+  "scripts": {
+    "setup": "((npm --prefix saas ci) || (\"%npm_node_execpath%\" \"%npm_execpath%\" --prefix saas ci)) && ((npm --prefix saas run db:generate) || (\"%npm_node_execpath%\" \"%npm_execpath%\" --prefix saas run db:generate)) && ((npm --prefix saas run db:validate) || (\"%npm_node_execpath%\" \"%npm_execpath%\" --prefix saas run db:validate))",
+    "dev": "(npm --prefix saas run dev) || (\"%npm_node_execpath%\" \"%npm_execpath%\" --prefix saas run dev)",
+    "plan:check": "(npm --prefix saas run plan:check) || (\"%npm_node_execpath%\" \"%npm_execpath%\" --prefix saas run plan:check)",
+    "lint": "(npm --prefix saas run lint) || (\"%npm_node_execpath%\" \"%npm_execpath%\" --prefix saas run lint)",
+    "typecheck": "(npm --prefix saas run typecheck) || (\"%npm_node_execpath%\" \"%npm_execpath%\" --prefix saas run typecheck)",
+    "test:unit": "(npm --prefix saas run test:unit) || (\"%npm_node_execpath%\" \"%npm_execpath%\" --prefix saas run test:unit)",
+    "test:integration": "(npm --prefix saas run test:integration) || (\"%npm_node_execpath%\" \"%npm_execpath%\" --prefix saas run test:integration)",
+    "test:e2e": "(npm --prefix saas run test:e2e) || (\"%npm_node_execpath%\" \"%npm_execpath%\" --prefix saas run test:e2e)",
+    "verify": "(npm --prefix saas run verify) || (\"%npm_node_execpath%\" \"%npm_execpath%\" --prefix saas run verify)",
+    "release:check": "(npm --prefix saas run release:check) || (\"%npm_node_execpath%\" \"%npm_execpath%\" --prefix saas run release:check)"
+  }
+}

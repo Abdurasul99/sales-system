@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Search, User, Phone, Mail, ShoppingBag, AlertTriangle, Star, ChevronRight, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatUzs, cn } from "@/lib/utils";
-import { CopilotDataProvider } from "@/components/ai/CopilotDataProvider";
 
 interface Customer {
   id: string;
@@ -43,7 +42,7 @@ export default function CustomersPage() {
     segment: "",
   });
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const res = await fetch(`/api/customers?search=${encodeURIComponent(search)}`);
     if (res.ok) {
@@ -51,11 +50,11 @@ export default function CustomersPage() {
       setCustomers(Array.isArray(data) ? data : []);
     }
     setLoading(false);
-  };
+  }, [search]);
 
   useEffect(() => {
-    load();
-  }, [search]);
+    void load();
+  }, [load]);
 
   const filtered = debtorFilter
     ? customers.filter((c) => Number(c.debtAmount) > 0)
@@ -80,7 +79,7 @@ export default function CustomersPage() {
       toast.success("Клиент добавлен");
       setShowModal(false);
       setForm({ fullName: "", phone: "", email: "", segment: "" });
-      load();
+      void load();
     } else {
       const d = await res.json();
       toast.error(d.error ?? "Ошибка");
@@ -115,7 +114,6 @@ export default function CustomersPage() {
   ];
 
   return (
-    <CopilotDataProvider data={{ totalCustomers: customers.length, totalDebt }}>
     <div className="p-4 md:p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
@@ -455,6 +453,5 @@ export default function CustomersPage() {
         </div>
       )}
     </div>
-    </CopilotDataProvider>
   );
 }
